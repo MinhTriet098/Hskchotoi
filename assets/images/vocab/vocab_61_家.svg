@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Chimney -->
+        <rect x="76" y="32" width="10" height="20" fill="#9a3412" rx="2"/>
+        <ellipse cx="81" cy="28" rx="5" ry="2" fill="#fed7aa" opacity="0.6"/>
+        <ellipse cx="84" cy="22" rx="7" ry="2.5" fill="#fed7aa" opacity="0.4"/>
+        <!-- Roof -->
+        <polygon points="64,28 22,60 106,60" fill="#ea580c"/>
+        <polygon points="64,32 28,60 100,60" fill="#f97316"/>
+        <!-- Walls -->
+        <rect x="32" y="60" width="64" height="46" fill="#fef3c7" rx="3"/>
+        <!-- Door -->
+        <rect x="54" y="76" width="20" height="30" fill="#9a3412" rx="2"/>
+        <circle cx="70" cy="92" r="2" fill="#facc15"/>
+        <!-- Windows -->
+        <rect x="38" y="70" width="12" height="12" fill="#38bdf8" rx="2"/>
+        <line x1="44" y1="70" x2="44" y2="82" stroke="#fff" stroke-width="1.5"/>
+        <line x1="38" y1="76" x2="50" y2="76" stroke="#fff" stroke-width="1.5"/>
+        <rect x="78" y="70" width="12" height="12" fill="#38bdf8" rx="2"/>
+        <line x1="84" y1="70" x2="84" y2="82" stroke="#fff" stroke-width="1.5"/>
+        <line x1="78" y1="76" x2="90" y2="76" stroke="#fff" stroke-width="1.5"/>
+        <!-- Heart on roof -->
+        <path d="M64 48 C64 44 60 40 56 40 C52 40 50 44 50 46 C50 52 64 58 64 58 C64 58 78 52 78 46 C78 44 76 40 72 40 C68 40 64 44 64 48 Z" fill="#dc2626"/>
+        
+  </g>
+</svg>

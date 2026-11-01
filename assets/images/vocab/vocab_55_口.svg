@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Family dining table / bowl -->
+        <ellipse cx="64" cy="74" rx="36" ry="16" fill="#fed7aa"/>
+        <ellipse cx="64" cy="72" rx="30" ry="12" fill="#ffffff"/>
+        <!-- Chopsticks -->
+        <line x1="42" y1="46" x2="82" y2="76" stroke="#9a3412" stroke-width="3" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="86" y2="72" stroke="#9a3412" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="64" cy="42" r="10" fill="#facc15"/>
+        
+  </g>
+</svg>

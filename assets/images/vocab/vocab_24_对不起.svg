@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#701a75"/>
+      <stop offset="100%" stop-color="#a21caf"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <circle cx="64" cy="52" r="22" fill="#fed7aa"/>
+        <!-- Bowing down eyes -->
+        <path d="M50 52 Q55 58 60 52" stroke="#4a044e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M68 52 Q73 58 78 52" stroke="#4a044e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="64" cy="64" rx="4" ry="2" fill="#4a044e"/>
+        <!-- Sweat drop -->
+        <path d="M84 40 Q87 46 84 49 C81 49 81 46 84 40 Z" fill="#38bdf8"/>
+        <!-- Clasped hands -->
+        <path d="M36 102 C36 86 48 82 64 82 C80 82 92 86 92 102 Z" fill="#86198f"/>
+        
+  </g>
+</svg>

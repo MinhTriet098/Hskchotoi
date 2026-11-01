@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9f1239"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <circle cx="64" cy="50" r="20" fill="#fed7aa"/>
+        <path d="M40 42 C40 28 50 24 64 24 C78 24 88 28 88 42 Q64 34 40 42" fill="#4c0519"/>
+        <circle cx="55" cy="50" r="2.5" fill="#4c0519"/>
+        <circle cx="73" cy="50" r="2.5" fill="#4c0519"/>
+        <path d="M58 60 Q64 65 70 60" stroke="#e11d48" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Big beating heart -->
+        <path d="M64 82 C64 72 52 66 42 66 C30 66 24 76 24 82 C24 98 64 112 64 112 C64 112 104 98 104 82 C104 76 98 66 86 66 C76 66 64 72 64 82 Z" fill="#f43f5e" stroke="#fff" stroke-width="2"/>
+        
+  </g>
+</svg>

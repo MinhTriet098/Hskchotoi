@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d174d"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Cake Base layer -->
+        <rect x="30" y="74" width="68" height="28" rx="6" fill="#fbbf24"/>
+        <path d="M30 82 Q38 88 47 82 Q56 88 64 82 Q72 88 81 82 Q90 88 98 82 L98 74 L30 74 Z" fill="#f43f5e"/>
+        <!-- Top layer -->
+        <rect x="42" y="52" width="44" height="24" rx="5" fill="#fef08a"/>
+        <path d="M42 58 Q49 64 56 58 Q64 64 72 58 Q79 64 86 58 L86 52 L42 52 Z" fill="#ec4899"/>
+        <!-- Candles -->
+        <rect x="52" y="38" width="4" height="14" fill="#38bdf8" rx="1"/>
+        <rect x="62" y="36" width="4" height="16" fill="#a855f7" rx="1"/>
+        <rect x="72" y="38" width="4" height="14" fill="#34d399" rx="1"/>
+        <!-- Flames -->
+        <path d="M54 32 Q56 36 54 38 Q52 36 54 32" fill="#f97316"/>
+        <path d="M64 30 Q66 34 64 36 Q62 34 64 30" fill="#f97316"/>
+        <path d="M74 32 Q76 36 74 38 Q72 36 74 32" fill="#f97316"/>
+        <!-- Sparkles -->
+        <circle cx="36" cy="38" r="2" fill="#facc15"/>
+        <circle cx="92" cy="42" r="2.5" fill="#facc15"/>
+        
+  </g>
+</svg>

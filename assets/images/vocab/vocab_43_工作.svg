@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Briefcase -->
+        <rect x="28" y="44" width="72" height="52" rx="8" fill="#92400e" stroke="#78350f" stroke-width="2"/>
+        <path d="M50 44 L50 36 C50 32 54 30 58 30 L70 30 C74 30 78 32 78 36 L78 44" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+        <!-- Straps & lock -->
+        <rect x="42" y="44" width="8" height="52" fill="#78350f"/>
+        <rect x="78" y="44" width="8" height="52" fill="#78350f"/>
+        <rect x="60" y="62" width="8" height="10" rx="2" fill="#fbbf24"/>
+        <circle cx="64" cy="67" r="1.5" fill="#78350f"/>
+        <!-- Laptop screen glow above -->
+        <polygon points="64,28 36,44 92,44" fill="#38bdf8" opacity="0.15"/>
+        
+  </g>
+</svg>

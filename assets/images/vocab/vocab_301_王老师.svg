@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#134e4a"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Blackboard -->
+        <rect x="22" y="26" width="84" height="54" rx="6" fill="#064e3b" stroke="#78350f" stroke-width="4"/>
+        <text x="42" y="48" font-size="12" fill="#fef08a" font-weight="bold">A B C</text>
+        <line x1="38" y1="56" x2="62" y2="56" stroke="#6ee7b7" stroke-width="2"/>
+        <line x1="38" y1="64" x2="56" y2="64" stroke="#6ee7b7" stroke-width="2"/>
+        <!-- Pointer stick -->
+        <line x1="88" y1="74" x2="64" y2="50" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+        <!-- Teacher avatar front right -->
+        <circle cx="86" cy="82" r="16" fill="#fed7aa"/>
+        <path d="M72 74 C72 66 80 64 88 64 C96 64 100 68 100 74 Z" fill="#312e81"/>
+        <!-- Glasses -->
+        <circle cx="81" cy="82" r="4" fill="none" stroke="#1e293b" stroke-width="2"/>
+        <circle cx="91" cy="82" r="4" fill="none" stroke="#1e293b" stroke-width="2"/>
+        <line x1="85" y1="82" x2="87" y2="82" stroke="#1e293b" stroke-width="2"/>
+        <path d="M68 106 C68 96 76 94 88 94 C100 94 108 96 108 106 Z" fill="#0d9488"/>
+        
+  </g>
+</svg>

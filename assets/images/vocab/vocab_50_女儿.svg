@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#be123c"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <circle cx="64" cy="54" r="22" fill="#fed7aa"/>
+        <!-- Hair with flower -->
+        <path d="M38 46 C38 28 50 26 64 26 C78 26 90 28 90 46 Q64 34 38 46" fill="#4c0519"/>
+        <circle cx="78" cy="38" r="5" fill="#facc15"/>
+        <circle cx="78" cy="38" r="2.5" fill="#e11d48"/>
+        <!-- Eyes & smile -->
+        <ellipse cx="53" cy="54" rx="3.5" ry="4.5" fill="#4c0519"/>
+        <circle cx="54" cy="53" r="1.5" fill="#fff"/>
+        <ellipse cx="75" cy="54" rx="3.5" ry="4.5" fill="#4c0519"/>
+        <circle cx="76" cy="53" r="1.5" fill="#fff"/>
+        <path d="M58 64 Q64 69 70 64" stroke="#e11d48" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M34 106 C34 88 46 84 64 84 C82 84 94 88 94 106 Z" fill="#fb7185"/>
+        
+  </g>
+</svg>

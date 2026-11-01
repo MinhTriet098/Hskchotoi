@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="url(#g)"/>
+  <rect width="124" height="124" x="2" y="2" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <g filter="url(#shadow)">
+    
+        <!-- Thai Pagoda / Wat -->
+        <polygon points="64,24 62,34 66,34" fill="#facc15"/>
+        <polygon points="64,34 54,46 74,46" fill="#fbbf24"/>
+        <polygon points="64,46 48,60 80,60" fill="#f59e0b"/>
+        <polygon points="64,60 40,78 88,78" fill="#d97706"/>
+        <rect x="58" y="78" width="12" height="14" fill="#78350f" rx="1"/>
+        <!-- Base stripes -->
+        <rect x="28" y="96" width="72" height="4" fill="#dc2626"/>
+        <rect x="28" y="100" width="72" height="4" fill="#2563eb"/>
+        
+  </g>
+</svg>
