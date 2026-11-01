@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initWorkbookModule === 'function') {
     initWorkbookModule();
   }
+  if (typeof initTranslatorModule === 'function') {
+    initTranslatorModule();
+  }
 });
 
 /**
@@ -162,23 +165,29 @@ function switchMainView(viewName) {
   const vocabTab = document.getElementById('view-tab-vocab');
   const dialogueTab = document.getElementById('view-tab-dialogue');
   const workbookTab = document.getElementById('view-tab-workbook');
+  const translatorTab = document.getElementById('view-tab-translator');
   const vocabContainer = document.getElementById('vocab-view-container');
   const dialogueContainer = document.getElementById('dialogue-view-container');
   const workbookContainer = document.getElementById('workbook-view-container');
+  const translatorContainer = document.getElementById('translator-view-container');
 
   // Reset tất cả tab về trạng thái thường
   const inactiveClass = "flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-white hover:bg-slate-800";
   if (vocabTab) vocabTab.className = inactiveClass;
   if (dialogueTab) dialogueTab.className = inactiveClass;
   if (workbookTab) workbookTab.className = inactiveClass;
+  if (translatorTab) translatorTab.className = inactiveClass;
 
   // Ẩn tất cả container
   if (vocabContainer) vocabContainer.classList.add('hidden');
   if (dialogueContainer) dialogueContainer.classList.add('hidden');
   if (workbookContainer) workbookContainer.classList.add('hidden');
+  if (translatorContainer) translatorContainer.classList.add('hidden');
 
-  // Dừng audio nếu đang phát
+  // Dừng audio/ghi âm nếu đang chạy
   if (typeof stopDialogueAudio === 'function') stopDialogueAudio();
+  if (typeof stopTranslatorRecording === 'function') stopTranslatorRecording();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   const wbAudio = document.getElementById('wb-audio-element');
   if (wbAudio) wbAudio.pause();
 
@@ -197,6 +206,14 @@ function switchMainView(viewName) {
     }
     if (typeof renderWorkbookView === 'function') {
       renderWorkbookView(currentLessonId);
+    }
+  } else if (viewName === 'translator') {
+    if (translatorContainer) translatorContainer.classList.remove('hidden');
+    if (translatorTab) {
+      translatorTab.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-500/25";
+    }
+    if (typeof renderTranslatorView === 'function') {
+      renderTranslatorView(translatorContainer);
     }
   } else {
     // Mặc định: Từ vựng
