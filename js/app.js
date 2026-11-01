@@ -413,11 +413,32 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
           </div>
 
           <!-- Chữ Hán & Phiên âm Pinyin -->
-          <div>
+          <div class="space-y-1">
             <h3 class="text-3xl font-extrabold text-white tracking-wide chinese-font flex items-center gap-2">
               ${item.hanzi}
             </h3>
-            <span class="text-sm text-cyan-400 font-medium italic">${item.pinyin}</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-sm text-cyan-400 font-medium italic">${item.pinyin}</span>
+              ${(() => {
+                const sInfo = (typeof window.getToneSandhiInfo === 'function') ? window.getToneSandhiInfo(item.hanzi, item.pinyin) : null;
+                if (!sInfo || !sInfo.hasSandhi) return '';
+                return `
+                  <span class="inline-flex items-center gap-1 text-[11px] bg-amber-500/15 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded-md font-medium leading-tight">
+                    <span class="text-amber-400 font-bold">Biến điệu:</span>
+                    <span>Gốc: <b>${sInfo.rootPy}</b> ➔ Đọc: <b class="text-cyan-300">${sInfo.spokenPy}</b></span>
+                  </span>
+                `;
+              })()}
+            </div>
+            ${(() => {
+              const sInfo = (typeof window.getToneSandhiInfo === 'function') ? window.getToneSandhiInfo(item.hanzi, item.pinyin) : null;
+              if (!sInfo || !sInfo.hasSandhi) return '';
+              return `
+                <div class="text-[11px] text-amber-200/90 leading-relaxed bg-amber-950/40 border border-amber-900/50 px-2.5 py-1.5 rounded-lg max-w-xl">
+                  💡 <b class="text-amber-300">(${sInfo.ruleName}):</b> ${sInfo.ruleTheory}
+                </div>
+              `;
+            })()}
           </div>
         </div>
 

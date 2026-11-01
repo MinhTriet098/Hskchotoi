@@ -162,7 +162,25 @@ function renderVoiceModalUI(showResult = false, evalData = null) {
   }
 
   document.getElementById('voice-hanzi').textContent = currentVoiceWord.hanzi;
-  document.getElementById('voice-pinyin').textContent = currentVoiceWord.pinyin;
+  // Hiển thị Pinyin kèm biến điệu nếu có
+  const voicePyEl = document.getElementById('voice-pinyin');
+  const sandhiInfo = (typeof window.getToneSandhiInfo === 'function') 
+    ? window.getToneSandhiInfo(currentVoiceWord.hanzi, currentVoiceWord.pinyin) 
+    : null;
+
+  if (sandhiInfo && sandhiInfo.hasSandhi) {
+    voicePyEl.innerHTML = `
+      <div class="flex flex-col items-center gap-1">
+        <span class="text-2xl font-bold text-cyan-400 font-mono tracking-wide">${currentVoiceWord.pinyin}</span>
+        <span class="inline-flex items-center gap-1 text-[11px] bg-amber-500/15 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-full font-medium">
+          <span>Gốc: <b>${sandhiInfo.rootPy}</b> ➔ Đọc: <b class="text-cyan-300">${sandhiInfo.spokenPy}</b></span>
+          <span class="text-amber-200/80">(${sandhiInfo.type})</span>
+        </span>
+      </div>
+    `;
+  } else {
+    voicePyEl.textContent = currentVoiceWord.pinyin;
+  }
   document.getElementById('voice-meaning').textContent = currentVoiceWord.meaning;
 
   // Render bảng hướng dẫn phát âm & cách đặt lưỡi an toàn
@@ -701,12 +719,17 @@ function renderPronunciationGuideUI(word) {
     html += `
       <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
         <div class="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 flex-wrap">
             <span class="text-lg font-black text-white chinese-font">${s.char}</span>
             <span class="text-sm font-bold text-rose-400 font-mono">${s.pinyin}</span>
+            ${s.rootPinyin && s.rootPinyin !== s.pinyin ? `
+              <span class="text-[10px] text-amber-300 bg-amber-950/80 border border-amber-800/80 px-1.5 py-0.2 rounded font-mono font-medium">
+                Gốc: ${s.rootPinyin}
+              </span>
+            ` : ''}
           </div>
-          <span class="text-[11px] font-bold text-amber-400 bg-amber-950/60 border border-amber-900/60 px-2 py-0.5 rounded-lg">
-            ${s.toneGuide ? s.toneGuide.name.split(' (')[0] : 'Thanh điệu'}
+          <span class="text-[10.5px] font-bold ${s.isNeutral ? 'text-teal-300 bg-teal-950/80 border-teal-800/80' : 'text-amber-400 bg-amber-950/60 border-amber-900/60'} border px-2 py-0.5 rounded-lg">
+            ${s.toneGuide ? s.toneGuide.name : 'Thanh điệu'}
           </span>
         </div>
 
