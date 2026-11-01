@@ -779,11 +779,10 @@ function executeSearch() {
   const normQueryNoSpace = normQuery.replace(/\s+/g, '');
 
   const filtered = sourceList.filter(item => {
-    // 1. Tìm theo Chữ Hán (từ vựng chính hoặc ví dụ)
+    // 1. Chỉ tìm theo Chữ Hán của từ vựng chính (KHÔNG tìm trong câu ví dụ bên dưới)
     if (item.hanzi && item.hanzi.includes(query)) return true;
-    if (item.ex_hz && item.ex_hz.includes(query)) return true;
 
-    // 2. Tìm theo Pinyin (có dấu hoặc không dấu, có/không khoảng trắng)
+    // 2. Chỉ tìm theo Pinyin của từ vựng chính (có dấu hoặc không dấu, có/không khoảng trắng)
     const rawPy = (item.pinyin || '').toLowerCase();
     const normPy = removePinyinTones(rawPy);
     const normPyNoSpace = normPy.replace(/\s+/g, '');
@@ -792,7 +791,7 @@ function executeSearch() {
     if (normPy.includes(normQuery)) return true;
     if (normQueryNoSpace && normPyNoSpace.includes(normQueryNoSpace)) return true;
 
-    // 3. Tìm theo Tiếng Việt (nghĩa từ, loại từ, giải thích, câu ví dụ)
+    // 3. Chỉ tìm theo Tiếng Việt của từ vựng chính (nghĩa từ, loại từ, giải thích loại từ)
     const rawMeaning = (item.meaning || '').toLowerCase();
     const normMeaning = removeVietnameseTones(rawMeaning);
     if (rawMeaning.includes(rawQuery) || normMeaning.includes(normQuery)) return true;
@@ -805,17 +804,6 @@ function executeSearch() {
       const rawDetail = item.type_detail.toLowerCase();
       const normDetail = removeVietnameseTones(rawDetail);
       if (rawDetail.includes(rawQuery) || normDetail.includes(normQuery)) return true;
-    }
-
-    if (item.ex_vi) {
-      const rawExVi = item.ex_vi.toLowerCase();
-      const normExVi = removeVietnameseTones(rawExVi);
-      if (rawExVi.includes(rawQuery) || normExVi.includes(normQuery)) return true;
-    }
-
-    if (item.ex_py) {
-      const normExPy = removePinyinTones(item.ex_py.toLowerCase());
-      if (normExPy.includes(normQuery)) return true;
     }
 
     return false;
