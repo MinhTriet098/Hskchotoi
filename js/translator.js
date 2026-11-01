@@ -13,6 +13,7 @@ window.TranslatorState = {
   inputVi: "",
   translatedZh: "",
   translatedPy: "",
+  showPinyin: true,
   isTranslating: false,
   isRecording: false,
   recognition: null,
@@ -157,8 +158,21 @@ function renderTranslatorView(container, isModal = false) {
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">Chữ Hán & Pinyin</span>
             </div>
 
-            <!-- Công cụ phát âm & sao chép -->
+            <!-- Công cụ phát âm, Pinyin & sao chép -->
             <div class="flex items-center gap-2 flex-wrap">
+              <!-- Nút Bật/Tắt Pinyin -->
+              <button onclick="toggleTranslatorPinyin()" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+                state.showPinyin !== false
+                  ? 'bg-blue-950/70 border-blue-500 text-blue-300 shadow-sm ring-1 ring-blue-500/30'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-400'
+              }" title="Bật hoặc Tắt hiển thị dòng phiên âm Pinyin">
+                <span>🔤</span>
+                <span>Pinyin</span>
+                <span class="text-[10px] font-black px-1.5 py-0.2 rounded ${state.showPinyin !== false ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'}">
+                  ${state.showPinyin !== false ? 'BẬT' : 'TẮT'}
+                </span>
+              </button>
+
               <button onclick="speakTargetChinese()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white text-xs font-black shadow-md flex items-center gap-1.5 transition-all">
                 <span>🔊</span> <span>Nghe phát âm chuẩn</span>
               </button>
@@ -183,7 +197,7 @@ function renderTranslatorView(container, isModal = false) {
             <p id="target-chinese-hanzi" class="text-2xl md:text-3xl font-black text-white font-kaiti leading-relaxed tracking-wider">
               ${(window.HanziLookup && window.HanziLookup.wrapText) ? window.HanziLookup.wrapText(state.translatedZh) : state.translatedZh}
             </p>
-            <p id="target-chinese-pinyin" class="text-sm md:text-base font-bold text-cyan-400 font-mono tracking-wide">
+            <p id="target-chinese-pinyin" class="text-sm md:text-base font-bold text-cyan-400 font-mono tracking-wide ${state.showPinyin === false ? 'hidden' : ''}">
               ${state.translatedPy}
             </p>
             <p class="text-[11px] text-amber-400/90 font-medium flex items-center gap-1.5 pt-1 border-t border-slate-800/60">
@@ -778,8 +792,8 @@ function renderEvaluationResult() {
                     ? 'border-rose-500 bg-rose-950/60 text-rose-300 ring-2 ring-rose-500/40 shadow-lg shadow-rose-500/20 scale-105' 
                     : 'border-amber-500/80 bg-amber-950/40 text-amber-300'
               }">
-                <!-- Pinyin mục tiêu -->
-                <span class="text-xs font-mono font-bold ${isCorrect ? 'text-emerald-400' : isWrong ? 'text-rose-400' : 'text-amber-400'}">
+                <!-- Pinyin mục tiêu (tuân thủ theo trạng thái bật/tắt Pinyin) -->
+                <span class="text-xs font-mono font-bold ${state.showPinyin === false ? 'hidden' : ''} ${isCorrect ? 'text-emerald-400' : isWrong ? 'text-rose-400' : 'text-amber-400'}">
                   ${py}
                 </span>
 
@@ -857,3 +871,21 @@ window.speakSingleChar = speakSingleChar;
 window.setTranslatorSpeed = setTranslatorSpeed;
 window.copyTargetChinese = copyTargetChinese;
 window.toggleTranslatorRecording = toggleTranslatorRecording;
+
+/**
+ * BẬT / TẮT HIỂN THỊ PINYIN TRONG BẢN DỊCH
+ */
+function toggleTranslatorPinyin() {
+  const state = window.TranslatorState;
+  state.showPinyin = (state.showPinyin === false) ? true : false;
+
+  const container = document.getElementById('translator-view-container') || document.getElementById('translator-modal-content');
+  if (container) {
+    renderTranslatorView(container, container.id === 'translator-modal-content');
+  }
+
+  if (typeof showToast === 'function') {
+    showToast(`🔤 Đã ${state.showPinyin ? 'BẬT' : 'TẮT'} hiển thị Pinyin`);
+  }
+}
+window.toggleTranslatorPinyin = toggleTranslatorPinyin;

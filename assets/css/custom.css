@@ -1,4 +1,4 @@
-/* ==============================================================
+﻿/* ==============================================================
    HiHSK Custom Theme & Rice Grid (Mễ Tự Cách) Styles
    ============================================================== */
 
@@ -23,7 +23,7 @@ body {
 }
 
 :root {
-  --chinese-font-kaiti: 'LXGW WenKai Screen', 'LXGW WenKai', 'KaiTi', '楷体', 'STKaiti', '华文楷体', 'Kaiti SC', 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+  --chinese-font-kaiti: 'LXGW WenKai Screen R', 'LXGW WenKai Screen', 'LXGW WenKai', 'KaiTi', '楷体', 'STKaiti', '华文楷体', 'Kaiti SC', 'Songti SC', 'STSong', 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
   --chinese-font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --chinese-font: var(--chinese-font-kaiti);
 }
@@ -366,3 +366,5 @@ img {
   object-fit: contain !important;
   display: block !important;
 }
+
+
