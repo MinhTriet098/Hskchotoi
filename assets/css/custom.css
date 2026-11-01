@@ -317,3 +317,52 @@ input:checked + .slider:before {
   border-left: 2px solid rgba(14, 165, 233, 0.85);
   border-top: 2px solid rgba(14, 165, 233, 0.85);
 }
+
+
+/* ==============================================================
+   KHẮC PHỤC TRIỆT ĐỂ LỖI ẢNH PHÌNH TO TRÊN IPAD / SAFARI WEBKIT
+   ============================================================== */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Khóa cứng kích thước ô ảnh từ vựng trên mọi trình duyệt & iPad */
+.vocab-img-box {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  flex: 0 0 56px !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background-color: #1e293b;
+}
+
+.vocab-img-box img,
+.vocab-card-img {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 0.75rem !important;
+}
+
+/* Khóa kích thước ảnh trong modal bộ thủ */
+.radical-char-img {
+  width: 64px !important;
+  height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  object-fit: contain !important;
+  display: block !important;
+}

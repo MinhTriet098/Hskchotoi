@@ -202,7 +202,7 @@ function renderCompoundsSection(data, radicalChar) {
     // Khung ảnh hoặc chữ Hán nổi bật nét bộ thủ màu đỏ (Ảnh 4)
     let charVisualHtml = '';
     if (item.image_10) {
-      charVisualHtml = `<img src="${item.image_10}" alt="${item.char}" class="w-16 h-16 rounded-xl object-contain p-1 group-hover:scale-105 transition-transform" />`;
+      charVisualHtml = `<img src="${item.image_10}" alt="${item.char}" class="radical-char-img w-16 h-16 rounded-xl object-contain p-1 group-hover:scale-105 transition-transform" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;" />`;
     } else {
       charVisualHtml = `
         <div class="w-16 h-16 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-center mb-1 group-hover:border-slate-700 transition-colors">

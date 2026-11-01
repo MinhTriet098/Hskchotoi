@@ -407,9 +407,9 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
             ${index + 1}
           </div>
 
-          <!-- Ảnh minh họa từ vựng -->
-          <div class="w-14 h-14 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-800 flex-shrink-0 relative group">
-            <img src="${item.image}" alt="${item.hanzi}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'56\\' height=\\'56\\' fill=\\'%231e293b\\'><rect width=\\'100%\\' height=\\'100%\\'/><text x=\\'50%\\' y=\\'55%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%2364748b\\' font-size=\\'22\\' font-weight=\\'bold\\'>${item.hanzi[0]}</text></svg>';" />
+          <!-- Ảnh minh họa từ vựng (Khóa cứng 56x56 chống phình to trên iPad/WebKit) -->
+          <div class="vocab-img-box w-14 h-14 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-800 flex-shrink-0 relative group" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px; flex: 0 0 56px;">
+            <img src="${item.image}" alt="${item.hanzi}" class="vocab-card-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" style="width: 56px; height: 56px; max-width: 56px; max-height: 56px; object-fit: cover;" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'56\\' height=\\'56\\' fill=\\'%231e293b\\'><rect width=\\'100%\\' height=\\'100%\\'/><text x=\\'50%\\' y=\\'55%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%2364748b\\' font-size=\\'22\\' font-weight=\\'bold\\'>${item.hanzi[0]}</text></svg>';" />
           </div>
 
           <!-- Chữ Hán & Phiên âm Pinyin -->
