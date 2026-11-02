@@ -403,7 +403,7 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
         <!-- Bên trái: Badge số, Hình ảnh, Chữ Hán lớn & Pinyin -->
         <div class="flex items-center gap-4">
           <!-- Số thứ tự đỏ bo góc (Ảnh 1) -->
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center font-extrabold text-white text-lg shadow-md flex-shrink-0">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg flex-shrink-0">
             ${index + 1}
           </div>
 
@@ -414,11 +414,11 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
 
           <!-- Chữ Hán & Phiên âm Pinyin -->
           <div class="space-y-1">
-            <h3 class="text-3xl font-extrabold text-white tracking-wide chinese-font flex items-center gap-2">
+            <h3 class="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-wide chinese-font flex items-center gap-3 drop-shadow-md select-text leading-none py-1">
               ${item.hanzi}
             </h3>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-sm text-cyan-400 font-medium italic">${item.pinyin}</span>
+              <span class="text-base sm:text-lg text-cyan-300 font-bold font-mono tracking-wide">${item.pinyin}</span>
               ${(() => {
                 const sInfo = (typeof window.getToneSandhiInfo === 'function') ? window.getToneSandhiInfo(item.hanzi, item.pinyin) : null;
                 if (!sInfo || !sInfo.hasSandhi) return '';
@@ -493,10 +493,10 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
 
       <!-- Hàng giữa: Loại từ & Nghĩa tiếng Việt -->
       <div class="py-3 flex items-center gap-3 flex-wrap">
-        <span class="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider border border-red-500/60 text-red-400 bg-red-950/30">
+        <span class="px-2.5 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider border border-rose-500/60 text-rose-300 bg-rose-950/40">
           ${item.type}
         </span>
-        <span class="text-sm font-medium text-slate-200">
+        <span class="text-base sm:text-lg font-bold text-slate-100">
           ${item.meaning}
         </span>
       </div>

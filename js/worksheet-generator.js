@@ -380,7 +380,7 @@
 
   function buildPageFooterHTML() {
     return `
-      <div style="border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: 6px; display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+      <div style="border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: auto; display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
         <span>HiHSK 3.0 • Vở Luyện Viết Khổ A4 (Lề: 1.7cm x 2.0cm)</span>
         <span>Học - Luyện - Viết Tay Mỗi Ngày</span>
       </div>

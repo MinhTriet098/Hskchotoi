@@ -96,39 +96,24 @@
         </div>
       </div>
 
-      <!-- Quick Actions & Lan Sync -->
-      <div class="flex items-center gap-2.5">
+      <!-- Top Right: Global Utilities & Mode -->
+      <div class="flex items-center gap-2">
         <!-- Nút Đổi Phông Chữ Hán (Khải Thư / Mặc định) -->
         <button onclick="toggleChineseFont()" class="btn-font-toggle flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/60 text-amber-300 hover:text-white text-xs font-bold transition-all shadow-sm" title="Chuyển đổi phông chữ: Khải Thư 楷体 (nét bút SGK) hoặc Mặc định 黑体 (nét in)">
           <span>🖌️</span>
           <span class="font-toggle-text">Khải Thư (楷体)</span>
         </button>
 
-        <!-- Nút Dịch & Luyện Nói AI -->
-        <button onclick="switchMainView('translator')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black transition-all shadow-md shadow-cyan-500/25 ring-1 ring-cyan-400/40">
-          <span>🌐</span>
-          <span>Dịch & Luyện Nói AI</span>
+        <!-- Nút In / Tải PDF A4 -->
+        <button onclick="openPrintModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/70 text-emerald-300 hover:text-white text-xs font-bold transition-all shadow-sm" title="In Vở Luyện Viết Ô Mễ &amp; Phiếu Bài Tập Khổ A4">
+          <span>🖨️</span>
+          <span>In / Tải PDF A4</span>
         </button>
 
         <!-- Nút Mở trên Mạng Nội Bộ / Điện thoại -->
-        <button onclick="openLanModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/70 text-indigo-300 hover:text-white text-xs font-bold transition-all shadow-md">
+        <button onclick="openLanModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/70 text-indigo-300 hover:text-white text-xs font-bold transition-all shadow-md" title="Mở trên điện thoại cùng mạng WiFi">
           <span>📱</span>
           <span class="hidden sm:inline">Học trên ĐT / LAN</span>
-        </button>
-
-        <button onclick="openDialogueGamesHub('sentence_builder')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-black transition-all shadow-md shadow-orange-500/20">
-          <span>🎮</span>
-          <span>Game Bài Khoá (6 Trò)</span>
-        </button>
-
-        <button onclick="openMemoryHub('meaning_quiz')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/70 hover:bg-purple-900 border border-purple-700/70 text-purple-300 hover:text-white text-xs font-bold transition-all shadow-sm">
-          <span>🧠</span>
-          <span>Luyện Nhớ (6 Trò)</span>
-        </button>
-
-        <button onclick="openRealConversationModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white text-xs font-black transition-all shadow-md shadow-emerald-500/20 active:scale-95" title="Đối thoại thực tế với bạn người bản xứ & Sửa lỗi phát âm tức thì">
-          <span>🗣️</span>
-          <span>Đàm Thoại AI Thực Tế</span>
         </button>
 
         <!-- Profile Badge Cá Nhân -->
@@ -141,109 +126,51 @@
       </div>
     </div>
 
-    <!-- Hàng dưới: Thanh chuyển chế độ học tập chính -->
-    <div class="max-w-[1440px] mx-auto px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto text-xs font-semibold text-slate-300 border-t border-slate-800/60 no-scrollbar">
-      <button onclick="switchMainView('vocab')" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-blue-400 font-bold">
-        <span>📚</span> Từ vựng (15 Bài)
-      </button>
-      <button onclick="switchMainView('dialogue')" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-amber-300 font-bold">
-        <span>💬</span> Bài khoá SGK (45 Đoạn)
-      </button>
-      <button onclick="openDialogueGamesHub('sentence_builder')" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-amber-400 font-bold">
-        <span>🎮</span> Game Bài Khoá
-      </button>
-      <button onclick="toggleChineseFont()" class="btn-font-toggle px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-amber-300 font-bold" title="Chuyển đổi phông chữ Hán: Khải Thư / Mặc định">
-        <span>🖌️</span> <span class="font-toggle-text">Khải Thư (楷体)</span>
-      </button>
-      <span class="text-slate-700">|</span>
-      <button onclick="openPinyinModal()" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-indigo-300">
-        <span>🔤</span> Pinyin Master
-      </button>
-      <button onclick="openWritingModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-purple-300">
-        <span>✍️</span> Luyện viết chữ Hán
-      </button>
-      <button onclick="openRadicalModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-rose-300">
-        <span>🧩</span> 100+ Bộ thủ
-      </button>
-      <button onclick="openVoiceModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-rose-400 font-bold">
-        <span>🎙️</span> Luyện phát âm AI
-      </button>
-      <button onclick="openMemoryHub('meaning_quiz')" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-purple-300 font-bold">
-        <span>🧠</span> Luyện Nhớ (6 Trò)
-      </button>
-      <span class="text-slate-700">|</span>
-      <button onclick="openPrintModal()" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold transition-all flex items-center gap-1.5 shadow-sm" title="Tải PDF hoặc In Vở Luyện Chữ (Ô Mễ) & Phiếu Bài Tập Tự Viết A4">
-        <span>🖨️</span> In / Tải PDF A4
-      </button>
+    <!-- THANH CÔNG CỤ BỔ TRỢ HỌC TẬP & MINI-GAME (Gọn gàng, duy nhất, không trùng lặp) -->
+    <div class="max-w-[1440px] mx-auto px-4 py-2 flex items-center justify-between gap-3 overflow-x-auto border-t border-slate-800/60 no-scrollbar">
+      <div class="flex items-center gap-2 flex-nowrap">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap pl-1">Công cụ:</span>
+        
+        <!-- Pinyin Master -->
+        <button onclick="openPinyinModal()" class="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 text-indigo-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <span>🔤</span>
+          <span>Pinyin Master</span>
+        </button>
+
+        <!-- Luyện thứ tự nét chữ Hán -->
+        <button onclick="openWritingModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/50 text-purple-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+          <span>Luyện thứ tự nét</span>
+        </button>
+
+        <!-- 100+ Bộ thủ -->
+        <button onclick="openRadicalModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-rose-500/50 text-rose-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>100+ Bộ thủ</span>
+        </button>
+
+        <!-- Luyện phát âm AI -->
+        <button onclick="openVoiceModal(getCurrentLessonWords()[0]?.id)" class="px-3 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900 border border-red-800/80 text-rose-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <svg class="w-3.5 h-3.5 text-rose-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+          <span>Luyện phát âm AI</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 flex-nowrap">
+        <!-- Game Bài Khoá (6 Trò) -->
+        <button onclick="openDialogueGamesHub('sentence_builder')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600/30 to-orange-600/30 hover:from-amber-600/50 hover:to-orange-600/50 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <span>🎮</span>
+          <span>Game Bài Khoá (6 Trò)</span>
+        </button>
+
+        <!-- Luyện Nhớ (6 Trò) -->
+        <button onclick="openMemoryHub('meaning_quiz')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600/30 to-indigo-600/30 hover:from-purple-600/50 hover:to-indigo-600/50 border border-purple-500/40 text-purple-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+          <span>🧠</span>
+          <span>Luyện Nhớ Mini Game (6 Trò)</span>
+        </button>
+      </div>
     </div>
   </header>
-
-  <!-- ==========================================
-       2. QUICK ACTION TOOLBAR (Các nút học tập cốt lõi - Gọn gàng, không trùng lặp)
-       ========================================== -->
-  <div class="max-w-[1440px] mx-auto px-4 py-3">
-    <div class="p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 flex items-center gap-2.5 overflow-x-auto no-scrollbar shadow-lg">
-      <!-- Dịch & Luyện Nói AI (MỚI) -->
-      <button onclick="switchMainView('translator')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-cyan-600/30 ring-1 ring-cyan-400/40 animate-pulse">
-        <span>🌐</span>
-        <span>Dịch & Luyện Nói AI</span>
-      </button>
-
-      <!-- 1. Sách Bài Tập (SBT MỚI) -->
-      <button onclick="switchMainView('workbook')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-emerald-500/20 ring-1 ring-emerald-400/40">
-        <span>📝</span>
-        <span>Sách Bài Tập (SBT 15 Bài)</span>
-      </button>
-
-      <!-- 2. Bài khoá SGK -->
-      <button onclick="switchMainView('dialogue')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-orange-500/20 ring-1 ring-amber-400/40">
-        <svg class="w-4 h-4 text-yellow-200" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-        <span>Bài khoá SGK (课文)</span>
-      </button>
-
-      <!-- Mini Game Bài Khoá (6 Trò) -->
-      <button onclick="openDialogueGamesHub('sentence_builder')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-600 to-amber-500 hover:from-purple-600 hover:to-amber-400 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-purple-600/30 ring-1 ring-purple-400/40">
-        <span>🎮</span>
-        <span>Game Hội Thoại (6 Trò)</span>
-      </button>
-
-      <!-- 2. Từ vựng bài học -->
-      <button onclick="switchMainView('vocab')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-300 hover:text-white text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-sm">
-        <span>📚</span>
-        <span>Từ vựng 15 Bài</span>
-      </button>
-
-      <!-- 3. Pinyin Master -->
-      <button onclick="openPinyinModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-blue-500/20 ring-1 ring-blue-400/40">
-        <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-        <span>Bảng Âm & Ghép Vần Pinyin</span>
-      </button>
-
-      <!-- 4. Luyện viết chữ Hán -->
-      <button onclick="openWritingModal(getCurrentLessonWords()[0]?.id)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-purple-300 hover:text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-sm">
-        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-        <span>Luyện thứ tự nét</span>
-      </button>
-
-      <!-- 5. Phân tích bộ thủ -->
-      <button onclick="openRadicalModal(getCurrentLessonWords()[0]?.id)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-rose-300 hover:text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-sm">
-        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        <span>100+ Bộ thủ</span>
-      </button>
-
-      <!-- 6. Luyện phát âm AI -->
-      <button onclick="openVoiceModal(getCurrentLessonWords()[0]?.id)" class="px-4 py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-700 text-rose-300 hover:text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-sm">
-        <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
-        <span>Luyện nói AI</span>
-      </button>
-
-      <!-- 7. Luyện Nhớ & Mini Game (6 Trò) -->
-      <button onclick="openMemoryHub('meaning_quiz')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-600 to-blue-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 whitespace-nowrap transition-all shadow-md shadow-purple-600/30 ring-1 ring-purple-400/50">
-        <span>🧠</span>
-        <span>Luyện Nhớ & Mini Game (6 Trò)</span>
-      </button>
-    </div>
-  </div>
 
   <!-- ==========================================
        3. MAIN LAYOUT: VOCAB LIST (LEFT) + SIDEBAR (RIGHT)
@@ -1393,7 +1320,7 @@
   <script src="js/translator.js?v=2.0"></script>
   <script src="js/worksheet-generator.js?v=2.0"></script>
   <script src="js/ai-conversation.js?v=1.0"></script>
-  <script src="js/app.js?v=3.8"></script>
+  <script src="js/app.js?v=3.9"></script>
 
   <script>
     // Xử lý Modal LAN & QR Code
