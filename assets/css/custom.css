@@ -318,6 +318,10 @@ input:checked + .slider:before {
   border-top: 2px solid rgba(14, 165, 233, 0.85);
 }
 
+#hanzi-lookup-tooltip.placed-side::after {
+  display: none !important;
+}
+
 
 /* ==============================================================
    KHẮC PHỤC TRIỆT ĐỂ LỖI ẢNH PHÌNH TO TRÊN IPAD / SAFARI WEBKIT

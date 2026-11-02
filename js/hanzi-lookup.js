@@ -10,11 +10,14 @@
 window.HanziLookup = {
   hoverTimer: null,
   hideTimer: null,
+  touchResetTimer: null,
   currentTarget: null,
   currentSyncId: null,
   tooltipEl: null,
   isTouch: false,
+  openedByClick: false,
   sortedDictKeys: [],
+  HOVER_DELAY: 2800, // Để chuột khoảng ~3s mới hiện (tránh hiện vội vã khi lướt chuột qua)
 
   init() {
     this.createTooltipElement();
@@ -338,10 +341,18 @@ window.HanziLookup = {
   bindGlobalEvents() {
     window.addEventListener('touchstart', () => {
       this.isTouch = true;
+      clearTimeout(this.touchResetTimer);
+      this.touchResetTimer = setTimeout(() => {
+        this.isTouch = false;
+      }, 1000);
     }, { passive: true });
 
-    // 1. RÊ CHUỘT (MOUSEOVER): Sáng tức thì & Mở Tooltip nhanh sau 180ms
+    // 1. RÊ CHUỘT (MOUSEOVER):
+    // - Sáng ngay lập tức cặp từ đồng bộ (Hán tự <-> Pinyin) để nhận biết Pinyin tương ứng.
+    // - CHỈ hiện Tooltip khi để chuột giữ yên khoảng 3 giây (~2800ms) để không che chữ khi lướt chuột qua.
     document.addEventListener('mouseover', (e) => {
+      if (this.isTouch) return;
+
       const target = e.target.closest('.hz-interactive, .sync-word');
       if (!target) return;
 
@@ -355,12 +366,13 @@ window.HanziLookup = {
       clearTimeout(this.hoverTimer);
       clearTimeout(this.hideTimer);
 
-      // Phản hồi nhanh 180ms
+      // Phải để chuột khoảng 3s mới hiện popup
       this.hoverTimer = setTimeout(() => {
         if (this.currentTarget === target) {
+          this.openedByClick = false;
           this.showTooltip(target);
         }
-      }, 180);
+      }, this.HOVER_DELAY);
     });
 
     document.addEventListener('mouseout', (e) => {
@@ -370,26 +382,35 @@ window.HanziLookup = {
       clearTimeout(this.hoverTimer);
       const syncId = target.getAttribute('data-sync-id');
 
+      // Nếu mở bằng click hoặc chạm iPad, KHÔNG tự tắt khi chuột rời ra ngoài
+      if (this.openedByClick) {
+        return;
+      }
+
       this.hideTimer = setTimeout(() => {
         if (!this.tooltipEl || !this.tooltipEl.matches(':hover')) {
           this.unhighlightSyncedPair(syncId);
           if (target) target.classList.remove('hz-active');
           this.hideTooltip();
         }
-      }, 200);
+      }, 250);
     });
 
-    // 2. CHẠM CẢM ỨNG (TOUCH / CLICK): Mở Tooltip tức thì 0ms
+    // 2. NHẤP CHUỘT HOẶC CHẠM CẢM ỨNG IPAD/ĐIỆN THOẠI (CLICK / TOUCH):
+    // Mở Tooltip TỨC THÌ (0ms) mà không cần chờ 3s!
     document.addEventListener('click', (e) => {
       const target = e.target.closest('.hz-interactive, .sync-word');
       if (target) {
         clearTimeout(this.hoverTimer);
         clearTimeout(this.hideTimer);
+
         const syncId = target.getAttribute('data-sync-id');
         this.currentSyncId = syncId;
         this.currentTarget = target;
+        this.openedByClick = true;
+
         this.highlightSyncedPair(syncId, target);
-        this.showTooltip(target);
+        this.showTooltip(target); // Hiện ngay lập tức!
         return;
       }
 
@@ -466,41 +487,107 @@ window.HanziLookup = {
   repositionTooltip() {
     if (!this.currentTarget || !this.tooltipEl) return;
 
-    const rect = this.currentTarget.getBoundingClientRect();
-    const tipRect = this.tooltipEl.getBoundingClientRect();
+    const target = this.currentTarget;
+    const rect = target.getBoundingClientRect();
+    
+    // Nếu từ này là 1 phần của cặp Hán tự - Pinyin (sync-word), ta lấy bounding rect bao trọn cả cặp
+    // để tính khoảng cách an toàn, tránh đè lên cả chữ Hán lẫn Pinyin
+    let combinedRect = {
+      top: rect.top,
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+      height: rect.height
+    };
 
-    const tipWidth = tipRect.width || 280;
-    const tipHeight = tipRect.height || 110;
-
-    let left = rect.left + (rect.width / 2) - (tipWidth / 2);
-
-    const margin = 12;
-    if (left < margin) left = margin;
-    if (left + tipWidth > window.innerWidth - margin) {
-      left = window.innerWidth - margin - tipWidth;
+    const syncId = target.getAttribute('data-sync-id');
+    if (syncId) {
+      const pairEls = document.querySelectorAll(`[data-sync-id="${syncId}"]`);
+      if (pairEls.length > 1) {
+        let minTop = Infinity, maxBottom = -Infinity, minLeft = Infinity, maxRight = -Infinity;
+        pairEls.forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.top < minTop) minTop = r.top;
+          if (r.bottom > maxBottom) maxBottom = r.bottom;
+          if (r.left < minLeft) minLeft = r.left;
+          if (r.right > maxRight) maxRight = r.right;
+        });
+        combinedRect = {
+          top: minTop,
+          bottom: maxBottom,
+          left: minLeft,
+          right: maxRight,
+          width: maxRight - minLeft,
+          height: maxBottom - minTop
+        };
+      }
     }
 
-    let top = rect.top - tipHeight - 10;
-    let flipBottom = false;
+    const tipRect = this.tooltipEl.getBoundingClientRect();
+    const tipWidth = tipRect.width || 300;
+    const tipHeight = tipRect.height || 115;
+    const margin = 14;
+    const vpWidth = window.innerWidth;
+    const vpHeight = window.innerHeight;
 
-    if (top < 10) {
-      top = rect.bottom + 10;
-      flipBottom = true;
+    let left = 0;
+    let top = 0;
+    let placement = 'side-right';
+
+    // ƯU TIÊN 1: ĐẶT SANG 1 BÊN (BÊN PHẢI HOẶC BÊN TRÁI) ĐỂ KHÔNG BAO GIỜ CHE DÒNG CHỮ
+    const spaceRight = vpWidth - combinedRect.right - margin;
+    const spaceLeft = combinedRect.left - margin;
+
+    if (spaceRight >= tipWidth + 14) {
+      // Đặt sang bên phải của từ
+      left = combinedRect.right + 14;
+      top = combinedRect.top + (combinedRect.height / 2) - (tipHeight / 2);
+      placement = 'side-right';
+    } else if (spaceLeft >= tipWidth + 14) {
+      // Đặt sang bên trái của từ
+      left = combinedRect.left - tipWidth - 14;
+      top = combinedRect.top + (combinedRect.height / 2) - (tipHeight / 2);
+      placement = 'side-left';
+    } else {
+      // ƯU TIÊN 2: NẾU 2 BÊN HẸP (MÀN HÌNH ĐIỆN THOẠI), ĐẶT LÊN CAO HẲN ĐỂ KHÔNG CHE DÒNG CHỮ HÁN
+      left = combinedRect.left + (combinedRect.width / 2) - (tipWidth / 2);
+      top = combinedRect.top - tipHeight - 24; // Lên cao hơn hẳn 24px so với đỉnh của cả cặp
+      placement = 'top';
+
+      // Nếu chạm sát mép trên màn hình, đặt xuống dưới dòng dịch tiếng Việt
+      if (top < margin) {
+        top = combinedRect.bottom + 24;
+        placement = 'bottom';
+      }
+    }
+
+    // Giữ an toàn trong màn hình (Clamping không bao giờ rớt ngoài viền)
+    if (left < margin) left = margin;
+    if (left + tipWidth > vpWidth - margin) {
+      left = vpWidth - margin - tipWidth;
+    }
+    if (top < margin) top = margin;
+    if (top + tipHeight > vpHeight - margin) {
+      top = vpHeight - margin - tipHeight;
     }
 
     this.tooltipEl.style.left = `${Math.round(left)}px`;
     this.tooltipEl.style.top = `${Math.round(top)}px`;
 
-    if (flipBottom) {
+    // Cập nhật mũi tên
+    this.tooltipEl.classList.remove('placed-side', 'flip-bottom');
+    if (placement === 'side-right' || placement === 'side-left') {
+      this.tooltipEl.classList.add('placed-side');
+    } else if (placement === 'bottom') {
       this.tooltipEl.classList.add('flip-bottom');
-    } else {
-      this.tooltipEl.classList.remove('flip-bottom');
     }
   },
 
   hideTooltip() {
     clearTimeout(this.hoverTimer);
     clearTimeout(this.hideTimer);
+    this.openedByClick = false;
 
     if (this.tooltipEl) {
       this.tooltipEl.classList.remove('opacity-100', 'scale-100');
