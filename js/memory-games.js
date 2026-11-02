@@ -56,6 +56,18 @@ window.MEMORY_HUB = {
     typing_game: { correct: 0, wrong: 0, score: 0 }
   },
 
+  // Cấu hình hiển thị Pinyin cho Mini Game Trắc nghiệm (Nhìn Hán tự đoán nghĩa & Nhìn nghĩa chọn Chữ)
+  quizSettings: {
+    showPinyin: (function() {
+      try {
+        const val = localStorage.getItem('hihsk_quiz_show_pinyin');
+        return val !== null ? (val === 'true') : true;
+      } catch (e) {
+        return true;
+      }
+    })()
+  },
+
   // Cấu hình linh hoạt cho Mini Game Đánh máy & Dịch
   typingSettings: {
     targetType: 'hanzi', // 'hanzi' (Gõ Chữ Hán) | 'vi' (Gõ Tiếng Việt - Dịch) | 'pinyin' (Gõ Pinyin)
@@ -252,7 +264,41 @@ function openMemoryHub(initialMode = 'meaning_quiz') {
   setHubTab(initialMode);
 }
 
+let listeningNextTimer = null;
+
+function advanceNextListeningQuestion() {
+  if (listeningNextTimer) {
+    clearTimeout(listeningNextTimer);
+    listeningNextTimer = null;
+  }
+  loadCurrentQuestion();
+}
+
+function toggleQuizPinyin() {
+  const hub = window.MEMORY_HUB;
+  if (!hub.quizSettings) {
+    hub.quizSettings = { showPinyin: true };
+  }
+  hub.quizSettings.showPinyin = !hub.quizSettings.showPinyin;
+  try {
+    localStorage.setItem('hihsk_quiz_show_pinyin', String(hub.quizSettings.showPinyin));
+  } catch (e) {}
+
+  const gameArea = document.getElementById('hub-game-area');
+  if (gameArea) {
+    if (hub.activeMode === 'meaning_quiz') {
+      renderMeaningQuiz(gameArea);
+    } else if (hub.activeMode === 'hanzi_quiz') {
+      renderHanziQuiz(gameArea);
+    }
+  }
+}
+
 function closeMemoryHub() {
+  if (listeningNextTimer) {
+    clearTimeout(listeningNextTimer);
+    listeningNextTimer = null;
+  }
   const modal = document.getElementById('memory-hub-modal');
   if (modal) modal.classList.add('hidden');
   if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -262,6 +308,10 @@ function closeMemoryHub() {
  * Chuyển đổi qua lại giữa 6 chế độ chơi
  */
 function setHubTab(mode) {
+  if (listeningNextTimer) {
+    clearTimeout(listeningNextTimer);
+    listeningNextTimer = null;
+  }
   const hub = window.MEMORY_HUB;
   hub.activeMode = mode;
 
@@ -289,6 +339,10 @@ function setHubTab(mode) {
  * Tải câu hỏi hiện tại cho chế độ đang chọn
  */
 function loadCurrentQuestion() {
+  if (listeningNextTimer) {
+    clearTimeout(listeningNextTimer);
+    listeningNextTimer = null;
+  }
   const hub = window.MEMORY_HUB;
   const gameArea = document.getElementById('hub-game-area');
   if (!gameArea) return;
@@ -379,6 +433,13 @@ function renderMeaningQuiz(container) {
   const word = hub.currentWord;
   if (!word) { renderSummaryScreen(); return; }
   const allWords = window.VOCAB_DATABASE || [];
+  const showPinyin = (hub.quizSettings && typeof hub.quizSettings.showPinyin === 'boolean') ? hub.quizSettings.showPinyin : true;
+
+  // Lấy pinyin biến điệu nếu có
+  const sandhiInfo = (typeof window.getToneSandhiInfo === 'function') 
+    ? window.getToneSandhiInfo(word.hanzi, word.pinyin) 
+    : null;
+  const pinyinDisplay = (sandhiInfo && sandhiInfo.hasSandhi) ? sandhiInfo.spokenPy : word.pinyin;
 
   // Tạo 4 lựa chọn (1 đúng + 3 ngẫu nhiên)
   const options = [word.meaning];
@@ -392,6 +453,17 @@ function renderMeaningQuiz(container) {
 
   container.innerHTML = `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      <!-- Thanh công cụ tùy chỉnh: Tắt / Bật Pinyin -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
+        <span class="text-xs text-slate-400 font-bold flex items-center gap-1.5">
+          <span>🎯</span> Nhìn Hán tự đoán nghĩa tiếng Việt
+        </span>
+        <button onclick="toggleQuizPinyin()" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${showPinyin ? 'bg-cyan-950/80 border border-cyan-500/80 text-cyan-300 shadow-sm' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}">
+          <span>${showPinyin ? '👁️' : '🙈'}</span>
+          <span>Pinyin: <b class="${showPinyin ? 'text-cyan-300' : 'text-slate-500'}">${showPinyin ? 'BẬT' : 'TẮT'}</b></span>
+        </button>
+      </div>
+
       <!-- Thẻ từ vựng mục tiêu -->
       <div class="p-6 rounded-3xl bg-slate-950/70 border border-slate-800 text-center relative overflow-hidden group">
         <button onclick="speakChinese('${word.hanzi}')" class="absolute top-4 right-4 w-10 h-10 rounded-2xl bg-slate-800/80 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition-all shadow-md" title="Nghe phát âm">
@@ -399,8 +471,17 @@ function renderMeaningQuiz(container) {
         </button>
 
         <span class="text-6xl sm:text-7xl font-black text-white chinese-font drop-shadow-lg tracking-wider">${word.hanzi}</span>
-        <p class="text-xl font-bold text-cyan-400 italic mt-3">${word.pinyin}</p>
-        <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-widest mt-1">Chọn nghĩa tiếng Việt tương ứng</p>
+        
+        ${showPinyin ? `
+          <p class="text-xl font-bold text-cyan-400 italic mt-3 animate-in fade-in">${pinyinDisplay}</p>
+        ` : `
+          <div class="mt-3">
+            <button onclick="toggleQuizPinyin()" class="text-xs font-semibold text-slate-500 hover:text-cyan-400 border border-dashed border-slate-800 hover:border-cyan-600/50 px-3 py-1 rounded-full transition-all inline-flex items-center gap-1.5 shadow-sm">
+              <span>🙈</span> Pinyin đang tắt (Bấm để bật)
+            </button>
+          </div>
+        `}
+        <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-widest mt-2">Chọn nghĩa tiếng Việt tương ứng</p>
       </div>
 
       <!-- 4 Lựa chọn -->
@@ -465,8 +546,8 @@ function renderListeningQuiz(container) {
         </div>
       </div>
 
-      <!-- Hộp Loa Phát Âm Trung Tâm -->
-      <div class="p-8 rounded-3xl bg-slate-950/70 border border-slate-800 text-center flex flex-col items-center justify-center space-y-4">
+      <!-- Hộp Loa Phát Âm Trung Tâm (Hiện Chữ Hán & Pinyin khi chọn đúng) -->
+      <div id="listening-center-card" class="p-8 rounded-3xl bg-slate-950/70 border border-slate-800 text-center flex flex-col items-center justify-center space-y-4 min-h-[220px]">
         <button onclick="speakChinese('${word.hanzi}', 1.0)" class="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all ring-8 ring-blue-500/20 group">
           <svg class="w-12 h-12 group-hover:animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
         </button>
@@ -1349,6 +1430,7 @@ function renderHanziQuiz(container) {
   const word = hub.currentWord;
   if (!word) { renderSummaryScreen(); return; }
   const allWords = window.VOCAB_DATABASE || [];
+  const showPinyin = (hub.quizSettings && typeof hub.quizSettings.showPinyin === 'boolean') ? hub.quizSettings.showPinyin : true;
 
   const options = [{ hanzi: word.hanzi, pinyin: word.pinyin, correct: true }];
   while (options.length < Math.min(4, allWords.length)) {
@@ -1361,6 +1443,17 @@ function renderHanziQuiz(container) {
 
   container.innerHTML = `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      <!-- Thanh công cụ tùy chỉnh: Tắt / Bật Pinyin -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
+        <span class="text-xs text-slate-400 font-bold flex items-center gap-1.5">
+          <span>🔍</span> Nhìn nghĩa tiếng Việt chọn Hán tự
+        </span>
+        <button onclick="toggleQuizPinyin()" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${showPinyin ? 'bg-cyan-950/80 border border-cyan-500/80 text-cyan-300 shadow-sm' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}">
+          <span>${showPinyin ? '👁️' : '🙈'}</span>
+          <span>Pinyin: <b class="${showPinyin ? 'text-cyan-300' : 'text-slate-500'}">${showPinyin ? 'BẬT' : 'TẮT'}</b></span>
+        </button>
+      </div>
+
       <div class="p-6 rounded-3xl bg-slate-950/70 border border-slate-800 text-center space-y-2">
         <span class="text-xs text-indigo-400 font-black uppercase tracking-wider block">Hãy chọn Chữ Hán mang nghĩa:</span>
         <h3 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">"${word.meaning}"</h3>
@@ -1371,7 +1464,7 @@ function renderHanziQuiz(container) {
         ${options.map(opt => `
           <button onclick="handleOptionSelect(this, '${opt.hanzi}', '${word.hanzi}')" class="p-5 rounded-2xl text-center bg-slate-900 border-2 border-slate-800 hover:border-blue-500 hover:bg-slate-850 transition-all shadow-md active:scale-95 group">
             <span class="text-3xl sm:text-4xl font-black text-white chinese-font block group-hover:scale-105 transition-transform">${opt.hanzi}</span>
-            <span class="text-xs text-cyan-400 font-mono italic block mt-1">${opt.pinyin}</span>
+            ${showPinyin ? `<span class="text-xs text-cyan-400 font-mono italic block mt-1">${opt.pinyin}</span>` : ''}
           </button>
         `).join('')}
       </div>
@@ -1907,9 +2000,73 @@ function handleOptionSelect(btnEl, selectedVal, correctVal) {
     });
   }
 
-  setTimeout(() => {
+  // Thời gian chờ trước khi chuyển câu
+  let delayMs = 850;
+
+  // Trong game Nghe đoán từ: hiện chữ Hán của từ đúng vài giây (2.5s) trước khi nhảy qua từ sau
+  if (mode === 'listening_quiz') {
+    const centerCard = document.getElementById('listening-center-card');
+    if (centerCard) {
+      if (isCorrect) {
+        delayMs = 2500; // Hiện chữ Hán đúng trong 2.5 giây
+        centerCard.innerHTML = `
+          <div class="space-y-3 animate-in zoom-in-95 duration-200 py-1 flex flex-col items-center">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black uppercase tracking-wider shadow-sm">
+              <span>✅</span> <span>Chính xác! (+10đ)</span>
+            </div>
+            <div class="py-1 text-center">
+              <span class="text-6xl sm:text-7xl font-black text-white chinese-font drop-shadow-xl tracking-wider block animate-bounce" style="animation-iteration-count: 2;">${word.hanzi}</span>
+              <p class="text-2xl font-bold text-cyan-300 font-mono tracking-wide mt-2">${word.pinyin}</p>
+              <p class="text-sm font-semibold text-slate-300 mt-1 italic">"${word.meaning}"</p>
+            </div>
+            <div class="pt-2 flex items-center justify-center gap-2 flex-wrap">
+              <button onclick="speakChinese('${word.hanzi}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm">
+                <span>🔊</span> Nghe lại
+              </button>
+              <button onclick="advanceNextListeningQuestion()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/30 transition-all">
+                <span>Từ tiếp theo ▶</span>
+              </button>
+            </div>
+            <div class="w-48 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-1">
+              <div class="h-full bg-emerald-500 rounded-full animate-listening-progress"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        delayMs = 2200; // Khi chọn sai: cũng hiện chữ Hán đáp án đúng
+        centerCard.innerHTML = `
+          <div class="space-y-3 animate-in zoom-in-95 duration-200 py-1 flex flex-col items-center">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider shadow-sm">
+              <span>❌</span> <span>Chưa đúng! Chữ Hán đúng:</span>
+            </div>
+            <div class="py-1 text-center">
+              <span class="text-6xl sm:text-7xl font-black text-white chinese-font drop-shadow-xl tracking-wider block">${word.hanzi}</span>
+              <p class="text-2xl font-bold text-cyan-300 font-mono tracking-wide mt-2">${word.pinyin}</p>
+              <p class="text-sm font-semibold text-slate-300 mt-1 italic">"${word.meaning}"</p>
+            </div>
+            <div class="pt-2 flex items-center justify-center gap-2 flex-wrap">
+              <button onclick="speakChinese('${word.hanzi}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm">
+                <span>🔊</span> Nghe lại
+              </button>
+              <button onclick="advanceNextListeningQuestion()" class="px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold flex items-center gap-1.5 transition-all">
+                <span>Từ tiếp theo ▶</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  if (listeningNextTimer) {
+    clearTimeout(listeningNextTimer);
+    listeningNextTimer = null;
+  }
+
+  listeningNextTimer = setTimeout(() => {
+    listeningNextTimer = null;
     loadCurrentQuestion();
-  }, 850);
+  }, delayMs);
 }
 
 /**
@@ -2007,6 +2164,8 @@ window.selectMatchCard = selectMatchCard;
 window.flipFlashcard = flipFlashcard;
 window.handleFlashcardRating = handleFlashcardRating;
 window.toggleListeningSubMode = toggleListeningSubMode;
+window.toggleQuizPinyin = toggleQuizPinyin;
+window.advanceNextListeningQuestion = advanceNextListeningQuestion;
 window.clearRecallCanvas = clearRecallCanvas;
 window.toggleRecallOutline = toggleRecallOutline;
 window.animateRecallWord = animateRecallWord;

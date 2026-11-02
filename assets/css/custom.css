@@ -1,4 +1,4 @@
-﻿/* ==============================================================
+/* ==============================================================
    HiHSK Custom Theme & Rice Grid (Mễ Tự Cách) Styles
    ============================================================== */
 
@@ -368,3 +368,14 @@ img {
 }
 
 
+
+
+/* Thanh đếm lùi thời gian cho game Nghe đoán từ */
+@keyframes listeningProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-listening-progress {
+  animation: listeningProgress 2.5s linear forwards;
+}
