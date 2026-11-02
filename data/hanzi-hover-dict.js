@@ -2,6 +2,115 @@
  * TỪ ĐIỂN TRA TỪ HÁN DI CHUỘT / CHẠM CẢM ỨNG (HOVER & TAP DICTIONARY)
  */
 window.HANZI_HOVER_DICT = {
+  "努力": {
+      "hz": "努力",
+      "py": "nǔlì",
+      "vi": "nỗ lực, cố gắng, chăm chỉ",
+      "type": "Động từ / Danh từ"
+  },
+  "棒": {
+      "hz": "棒",
+      "py": "bàng",
+      "vi": "giỏi, cừ, tuyệt vời, xuất sắc",
+      "type": "Tính từ"
+  },
+  "得": {
+      "hz": "得",
+      "py": "de",
+      "vi": "được (trợ từ kết cấu đứng sau động từ biểu thị kết quả/trình độ, ví dụ: 学得很棒)",
+      "type": "Trợ từ"
+  },
+  "圆满": {
+      "hz": "圆满",
+      "py": "yuánmǎn",
+      "vi": "viên mãn, trọn vẹn, tốt đẹp",
+      "type": "Tính từ"
+  },
+  "完成": {
+      "hz": "完成",
+      "py": "wánchéng",
+      "vi": "hoàn thành, làm xong",
+      "type": "Động từ"
+  },
+  "进步": {
+      "hz": "进步",
+      "py": "jìnbù",
+      "vi": "tiến bộ, phát triển",
+      "type": "Động từ / Danh từ"
+  },
+  "练习": {
+      "hz": "练习",
+      "py": "liànxí",
+      "vi": "luyện tập, bài tập rèn luyện",
+      "type": "Động từ / Danh từ"
+  },
+  "对话": {
+      "hz": "对话",
+      "py": "duìhuà",
+      "vi": "đối thoại, hội thoại, trò chuyện",
+      "type": "Danh từ / Động từ"
+  },
+  "西安": {
+      "hz": "西安",
+      "py": "Xī'ān",
+      "vi": "Tây An (thành phố cổ nổi tiếng Trung Quốc)",
+      "type": "Danh từ riêng"
+  },
+  "星期四": {
+      "hz": "星期四",
+      "py": "xīngqīsì",
+      "vi": "thứ Năm",
+      "type": "Danh từ"
+  },
+  "阮文敏": {
+      "hz": "阮文敏",
+      "py": "Ruǎn Wénmǐn",
+      "vi": "Nguyễn Văn Mẫn (tên người)",
+      "type": "Danh từ riêng"
+  },
+  "文敏": {
+      "hz": "文敏",
+      "py": "Wénmǐn",
+      "vi": "Văn Mẫn (tên riêng)",
+      "type": "Danh từ riêng"
+  },
+  "中国人": {
+      "hz": "中国人",
+      "py": "zhōngguórén",
+      "vi": "người Trung Quốc",
+      "type": "Danh từ"
+  },
+  "越南人": {
+      "hz": "越南人",
+      "py": "yuènánrén",
+      "vi": "người Việt Nam",
+      "type": "Danh từ"
+  },
+  "美国人": {
+      "hz": "美国人",
+      "py": "měiguórén",
+      "vi": "người Mỹ",
+      "type": "Danh từ"
+  },
+  "法国人": {
+      "hz": "法国人",
+      "py": "fǎguórén",
+      "vi": "người Pháp",
+      "type": "Danh từ"
+  },
+  "泰国人": {
+      "hz": "泰国人",
+      "py": "tàiguórén",
+      "vi": "người Thái Lan",
+      "type": "Danh từ"
+  },
+  "太棒了": {
+      "hz": "太棒了",
+      "py": "tài bàng le",
+      "vi": "tuyệt vời quá, giỏi quá!",
+      "type": "Thán từ"
+  },
+
   "你好": {
     "hz": "你好",
     "py": "nǐ hǎo",

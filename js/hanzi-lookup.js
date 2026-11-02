@@ -1,16 +1,17 @@
 /**
- * MODULE TRA TỪ CHỮ HÁN THÔNG MINH (HOVER DWELL & TOUCH LOOKUP)
- * Tính năng theo yêu cầu:
- *  - Di chuyển chuột vào chữ Hán -> Highlight sáng ngay lập tức
- *  - Giữ chuột khoảng 1 giây -> Hiện Tooltip nghĩa tiếng Việt & Pinyin ngay trên đầu chữ
- *  - Trên iPad / Màn hình cảm ứng -> Chạm (tap) vào chữ sẽ hiện ngay Tooltip
- *  - Tích hợp phát âm từ vựng (TTS)
+ * MODULE TRA TỪ CHỮ HÁN THÔNG MINH (BI-DIRECTIONAL SYNCED HOVER & TOUCH LOOKUP)
+ * Tính năng đột phá:
+ *  - Đồng bộ 2 chiều Hán tự <-> Pinyin: Rê chuột vào chữ Hán thì Pinyin tương ứng sáng lên,
+ *    và rê chuột vào Pinyin thì chữ Hán tương ứng cũng sáng lên!
+ *  - Hiện Tooltip tra từ tức thì (Chữ Hán to, Pinyin, Nghĩa tiếng Việt, Từ loại & Phát âm)
+ *  - Hỗ trợ màn hình cảm ứng / iPad / Điện thoại (Chạm là sáng cả đôi và hiện nghĩa)
  */
 
 window.HanziLookup = {
   hoverTimer: null,
   hideTimer: null,
   currentTarget: null,
+  currentSyncId: null,
   tooltipEl: null,
   isTouch: false,
   sortedDictKeys: [],
@@ -42,25 +43,25 @@ window.HanziLookup = {
 
     const tip = document.createElement('div');
     tip.id = 'hanzi-lookup-tooltip';
-    tip.className = 'fixed z-[999999] pointer-events-auto bg-slate-950/95 border-2 border-cyan-400 shadow-2xl shadow-cyan-950/80 backdrop-blur-md rounded-2xl p-3 max-w-[280px] sm:max-w-[320px] text-left transition-all duration-200 hidden opacity-0 scale-95';
+    tip.className = 'fixed z-[999999] pointer-events-auto bg-slate-950/95 border-2 border-cyan-400 shadow-2xl shadow-cyan-950/90 backdrop-blur-md rounded-2xl p-3.5 max-w-[290px] sm:max-w-[340px] text-left transition-all duration-200 hidden opacity-0 scale-95';
     tip.innerHTML = `
-      <div class="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-1.5 mb-1.5">
-        <div class="flex items-baseline gap-2">
-          <span id="hz-tip-hanzi" class="text-2xl font-black text-cyan-300 font-kaiti tracking-wide"></span>
-          <span id="hz-tip-pinyin" class="text-xs font-bold text-cyan-400 font-mono"></span>
+      <div class="flex items-start justify-between gap-2.5 border-b border-slate-800 pb-2 mb-2">
+        <div class="flex items-baseline gap-2.5 flex-wrap">
+          <span id="hz-tip-hanzi" class="text-3xl font-black text-amber-300 font-kaiti tracking-wide drop-shadow"></span>
+          <span id="hz-tip-pinyin" class="text-sm font-bold text-cyan-300 font-mono tracking-wide"></span>
         </div>
-        <div class="flex items-center gap-1">
-          <button id="hz-tip-audio-btn" type="button" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition-all text-xs" title="Phát âm từ này">
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <button id="hz-tip-audio-btn" type="button" class="w-7 h-7 rounded-lg bg-blue-600/30 hover:bg-blue-600 text-cyan-300 hover:text-white border border-blue-500/50 flex items-center justify-center transition-all text-xs shadow-sm" title="Phát âm từ này">
             🔊
           </button>
-          <button id="hz-tip-close-btn" type="button" class="w-6 h-6 rounded-lg bg-slate-800/80 hover:bg-rose-600 text-slate-400 hover:text-white flex items-center justify-center transition-all text-xs" title="Đóng">
+          <button id="hz-tip-close-btn" type="button" class="w-7 h-7 rounded-lg bg-slate-800/80 hover:bg-rose-600 text-slate-400 hover:text-white flex items-center justify-center transition-all text-xs" title="Đóng">
             ✕
           </button>
         </div>
       </div>
-      <div class="space-y-1">
-        <p id="hz-tip-meaning" class="text-xs text-slate-200 font-semibold leading-relaxed"></p>
-        <div id="hz-tip-type-badge" class="inline-block text-[9px] font-bold text-cyan-300 bg-cyan-950/80 border border-cyan-700/60 px-1.5 py-0.2 rounded mt-0.5"></div>
+      <div class="space-y-1.5">
+        <p id="hz-tip-meaning" class="text-sm text-slate-100 font-bold leading-relaxed"></p>
+        <div id="hz-tip-type-badge" class="inline-block text-[10px] font-extrabold uppercase tracking-wider text-cyan-300 bg-cyan-950/80 border border-cyan-700/60 px-2 py-0.5 rounded-md mt-0.5"></div>
       </div>
     `;
 
@@ -73,8 +74,12 @@ window.HanziLookup = {
       audioBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const hz = tip.getAttribute('data-active-hz');
-        if (hz && typeof speakChineseText === 'function') {
-          speakChineseText(hz);
+        if (hz) {
+          if (typeof speakChinese === 'function') {
+            speakChinese(hz);
+          } else if (typeof speakChineseText === 'function') {
+            speakChineseText(hz);
+          }
         }
       });
     }
@@ -97,7 +102,134 @@ window.HanziLookup = {
   },
 
   /**
-   * Phân tích câu tiếng Trung thành các thẻ <span class="hz-interactive"> có thể tra cứu
+   * Đếm số âm tiết (syllables) trong 1 từ Pinyin dựa vào nguyên âm có dấu
+   */
+  countPinyinSyllables(token) {
+    if (!token) return 0;
+    const clean = token.replace(/[^a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]/g, '');
+    if (!clean) return 0;
+    const matches = clean.match(/(?:[bcdfghjklmnpqrstwxyzBCDFGHJKLMNPQRSTWXYZ]{0,2})(?:[aeiouüv\u00C0-\u024F\u1E00-\u1EFF]+(?:ng|n|r)?)/gi);
+    return Math.max(1, matches ? matches.length : 1);
+  },
+
+  /**
+   * Tra cứu thông tin từ điển thông minh (Dict -> HSK_VOCAB -> Ký tự đơn)
+   */
+  getDictInfo(hz, py) {
+    const dict = window.HANZI_HOVER_DICT || {};
+    if (dict[hz]) return dict[hz];
+
+    // Tra trong danh sách HSK 1
+    if (window.HSK_VOCAB_LIST && Array.isArray(window.HSK_VOCAB_LIST)) {
+      const found = window.HSK_VOCAB_LIST.find(w => w.hanzi === hz);
+      if (found) {
+        return {
+          hz: found.hanzi,
+          py: found.pinyin || py,
+          vi: found.meaning,
+          type: found.type || ''
+        };
+      }
+    }
+
+    // Nếu từ ghép không có, ghép nghĩa các từ đơn
+    if (hz && hz.length > 1) {
+      const parts = [];
+      for (const ch of hz) {
+        if (dict[ch] && dict[ch].vi) {
+          parts.push(`${ch}: ${dict[ch].vi}`);
+        }
+      }
+      if (parts.length > 0) {
+        return {
+          hz,
+          py: py || '',
+          vi: parts.join(' • '),
+          type: 'Từ ghép'
+        };
+      }
+    }
+
+    return {
+      hz,
+      py: py || '',
+      vi: 'Từ vựng tiếng Trung',
+      type: ''
+    };
+  },
+
+  /**
+   * Tách câu Hán tự và Pinyin thành các cặp từ đồng bộ (Hanzi <-> Pinyin)
+   */
+  alignSentence(hzText, pyText) {
+    if (!hzText || !pyText) return [];
+
+    const pyTokens = pyText.match(/([a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]+|[^\s\w\u00C0-\u024F\u1E00-\u1EFF])/g) || [];
+    const pairs = [];
+    let hzIdx = 0;
+    const hzLen = hzText.length;
+
+    pyTokens.forEach((token) => {
+      if (hzIdx >= hzLen) return;
+      while (hzIdx < hzLen && hzText[hzIdx] === ' ') hzIdx++;
+      if (hzIdx >= hzLen) return;
+
+      const isAlpha = /[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]/.test(token);
+      if (!isAlpha) {
+        // Dấu câu (Punctuation)
+        const hzChar = hzText[hzIdx];
+        pairs.push({ hz: hzChar, py: token, isPunct: true });
+        hzIdx++;
+      } else {
+        const sylCount = this.countPinyinSyllables(token);
+        let hzWord = '';
+        for (let i = 0; i < sylCount; i++) {
+          if (hzIdx < hzLen) {
+            hzWord += hzText[hzIdx];
+            hzIdx++;
+          }
+        }
+        pairs.push({ hz: hzWord, py: token, isPunct: false });
+      }
+    });
+
+    while (hzIdx < hzLen) {
+      pairs.push({ hz: hzText[hzIdx], py: '', isPunct: true });
+      hzIdx++;
+    }
+
+    return pairs;
+  },
+
+  /**
+   * Render HTML câu Hán tự và Pinyin liên kết tương tác 2 chiều
+   */
+  renderSyncedSentence(hzText, pyText, scopeId = 's', isAI = false) {
+    const pairs = this.alignSentence(hzText, pyText);
+    let hzHtml = '';
+    let pyHtml = '';
+
+    pairs.forEach((p, idx) => {
+      if (p.isPunct) {
+        hzHtml += `<span class="punct-char select-none">${p.hz}</span>`;
+        if (p.py) pyHtml += `<span class="punct-char select-none">${p.py}</span>`;
+      } else {
+        const syncId = `sync-${scopeId}-${idx}`;
+        const info = this.getDictInfo(p.hz, p.py);
+        const escapedVi = (info.vi || '').replace(/"/g, '&quot;');
+        const escapedPy = (info.py || p.py).replace(/"/g, '&quot;');
+        const escapedType = (info.type || '').replace(/"/g, '&quot;');
+
+        hzHtml += `<span class="sync-word sync-word-hz" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để dịch từ này">${p.hz}</span>`;
+        pyHtml += `<span class="sync-word sync-word-py" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để xem chữ Hán và dịch">${p.py}</span> `;
+      }
+    });
+
+    return { hzHtml, pyHtml };
+  },
+
+  /**
+   * Phân tích câu tiếng Trung thuần văn bản thành các thẻ <span class="hz-interactive">
    */
   wrapText(text) {
     if (!text || typeof text !== 'string') return text;
@@ -129,11 +261,10 @@ window.HanziLookup = {
 
       if (!matched) {
         const ch = text[i];
-        // Nếu là chữ Hán đơn chưa có trong danh sách từ ghép
         if (ch >= '\u4e00' && ch <= '\u9fff') {
           const info = dict[ch] || {};
           const py = info.py || (window.PINYIN_MAP ? window.PINYIN_MAP[ch] : '') || '';
-          const vi = info.vi || 'Từ tiếng Trung HSK 1';
+          const vi = info.vi || 'Chữ Hán tiếng Trung';
           const type = info.type || '';
           result += `<span class="hz-interactive" data-hz="${ch}" data-py="${py}" data-vi="${vi}" data-type="${type}">${ch}</span>`;
         } else {
@@ -147,38 +278,24 @@ window.HanziLookup = {
   },
 
   /**
-   * Xử lý quét và đóng gói các phần tử chứa chữ Hán trên trang
+   * Xử lý quét các vùng văn bản chưa được gắn thẻ
    */
   processAllHanziContainers() {
-    // 1. Toàn văn bài nói hoàn chỉnh
     const fullSpeechEl = document.getElementById('full-speech-hanzi');
     if (fullSpeechEl && !fullSpeechEl.hasAttribute('data-hz-processed')) {
       fullSpeechEl.innerHTML = this.wrapText(fullSpeechEl.textContent);
       fullSpeechEl.setAttribute('data-hz-processed', 'true');
     }
 
-    // 2. Từng câu trong bài nói
     const speechSentences = document.querySelectorAll('.family-speech-hanzi, [id^="family-sent-card-"] p.font-kaiti');
     speechSentences.forEach(el => {
-      if (!el.hasAttribute('data-hz-processed') && !el.querySelector('.hz-interactive')) {
-        el.innerHTML = this.wrapText(el.textContent);
-        el.setAttribute('data-hz-processed', 'true');
-      }
-    });
-
-    // 3. Toàn bộ các dòng bài khoá hội thoại
-    const dialogueLines = document.querySelectorAll('.dialogue-line-hanzi');
-    dialogueLines.forEach(el => {
-      if (!el.hasAttribute('data-hz-processed') && !el.querySelector('.hz-interactive')) {
+      if (!el.hasAttribute('data-hz-processed') && !el.querySelector('.hz-interactive, .sync-word')) {
         el.innerHTML = this.wrapText(el.textContent);
         el.setAttribute('data-hz-processed', 'true');
       }
     });
   },
 
-  /**
-   * Lắng nghe biến động DOM (khi mở modal hoặc chuyển tab hội thoại mới)
-   */
   initObserver() {
     const observer = new MutationObserver(() => {
       this.processAllHanziContainers();
@@ -191,66 +308,100 @@ window.HanziLookup = {
   },
 
   /**
+   * Làm nổi bật cả cặp (Chữ Hán & Pinyin đồng bộ)
+   */
+  highlightSyncedPair(syncId, activeTarget) {
+    // Xóa active cũ
+    document.querySelectorAll('.sync-word-active').forEach(el => el.classList.remove('sync-word-active'));
+    document.querySelectorAll('.hz-interactive.hz-active').forEach(el => el.classList.remove('hz-active'));
+
+    if (syncId) {
+      document.querySelectorAll(`[data-sync-id="${syncId}"]`).forEach(el => {
+        el.classList.add('sync-word-active');
+      });
+    } else if (activeTarget) {
+      activeTarget.classList.add('hz-active');
+    }
+  },
+
+  unhighlightSyncedPair(syncId) {
+    if (syncId) {
+      document.querySelectorAll(`[data-sync-id="${syncId}"]`).forEach(el => {
+        el.classList.remove('sync-word-active');
+      });
+    }
+  },
+
+  /**
    * Gắn sự kiện toàn cục: Di chuột & Chạm cảm ứng iPad
    */
   bindGlobalEvents() {
-    // Phát hiện thiết bị cảm ứng
     window.addEventListener('touchstart', () => {
       this.isTouch = true;
     }, { passive: true });
 
-    // 1. HOVER MOUSE EVENTS (Khi rê chuột)
+    // 1. RÊ CHUỘT (MOUSEOVER): Sáng tức thì & Mở Tooltip nhanh sau 180ms
     document.addEventListener('mouseover', (e) => {
-      const target = e.target.closest('.hz-interactive');
+      const target = e.target.closest('.hz-interactive, .sync-word');
       if (!target) return;
 
-      // Highlight ngay lập tức khi chuột vừa chạm vào chữ Hán
-      this.highlightElement(target);
-
-      // Đặt hẹn giờ khoảng 1 giây (900ms) để mở Tooltip nghĩa tiếng Việt
-      clearTimeout(this.hoverTimer);
+      const syncId = target.getAttribute('data-sync-id');
+      this.currentSyncId = syncId;
       this.currentTarget = target;
 
+      // Sáng ngay lập tức cả Chữ Hán lẫn Pinyin!
+      this.highlightSyncedPair(syncId, target);
+
+      clearTimeout(this.hoverTimer);
+      clearTimeout(this.hideTimer);
+
+      // Phản hồi nhanh 180ms
       this.hoverTimer = setTimeout(() => {
         if (this.currentTarget === target) {
           this.showTooltip(target);
         }
-      }, 900);
+      }, 180);
     });
 
     document.addEventListener('mouseout', (e) => {
-      const target = e.target.closest('.hz-interactive');
+      const target = e.target.closest('.hz-interactive, .sync-word');
       if (!target) return;
 
       clearTimeout(this.hoverTimer);
-      this.unhighlightElement(target);
+      const syncId = target.getAttribute('data-sync-id');
 
-      // Cho một khoảng trễ ngắn để chuột có thể di chuyển vào tooltip mà không bị tắt
       this.hideTimer = setTimeout(() => {
         if (!this.tooltipEl || !this.tooltipEl.matches(':hover')) {
+          this.unhighlightSyncedPair(syncId);
+          if (target) target.classList.remove('hz-active');
           this.hideTooltip();
         }
-      }, 250);
+      }, 200);
     });
 
-    // 2. TOUCH / IPAD EVENTS (Khi chạm cảm ứng)
+    // 2. CHẠM CẢM ỨNG (TOUCH / CLICK): Mở Tooltip tức thì 0ms
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('.hz-interactive');
+      const target = e.target.closest('.hz-interactive, .sync-word');
       if (target) {
-        // Trên iPad / cảm ứng hoặc click chuột trực tiếp: Hiển thị ngay tooltip không cần chờ 1s!
         clearTimeout(this.hoverTimer);
-        this.highlightElement(target);
+        clearTimeout(this.hideTimer);
+        const syncId = target.getAttribute('data-sync-id');
+        this.currentSyncId = syncId;
+        this.currentTarget = target;
+        this.highlightSyncedPair(syncId, target);
         this.showTooltip(target);
         return;
       }
 
-      // Nếu bấm ra ngoài vùng chữ và ngoài tooltip -> Đóng tooltip
+      // Nhấp ra ngoài -> Đóng tooltip
       if (this.tooltipEl && !this.tooltipEl.contains(e.target)) {
+        if (this.currentSyncId) {
+          this.unhighlightSyncedPair(this.currentSyncId);
+        }
         this.hideTooltip();
       }
     });
 
-    // Cuộn trang hoặc đổi kích thước -> Cập nhật hoặc ẩn tooltip
     window.addEventListener('scroll', () => {
       if (this.tooltipEl && !this.tooltipEl.classList.contains('hidden')) {
         this.repositionTooltip();
@@ -263,33 +414,26 @@ window.HanziLookup = {
   },
 
   /**
-   * Làm nổi bật (Highlight) chữ Hán ngay lập tức
-   */
-  highlightElement(el) {
-    document.querySelectorAll('.hz-interactive.hz-active').forEach(item => {
-      if (item !== el) item.classList.remove('hz-active');
-    });
-    el.classList.add('hz-active');
-  },
-
-  unhighlightElement(el) {
-    if (this.currentTarget !== el || !this.tooltipEl || this.tooltipEl.classList.contains('hidden')) {
-      el.classList.remove('hz-active');
-    }
-  },
-
-  /**
-   * Hiển thị Tooltip tra từ ngay phía trên chữ Hán
+   * Hiển thị Tooltip tra từ
    */
   showTooltip(target) {
     if (!this.tooltipEl) this.createTooltipElement();
 
     const hz = target.getAttribute('data-hz') || target.textContent.trim();
-    const py = target.getAttribute('data-py') || '';
-    const vi = target.getAttribute('data-vi') || '';
-    const type = target.getAttribute('data-type') || '';
+    let py = target.getAttribute('data-py') || '';
+    let vi = target.getAttribute('data-vi') || '';
+    let type = target.getAttribute('data-type') || '';
 
-    // Cập nhật nội dung Tooltip
+    // Nếu thông tin rỗng, thử tra cứu động
+    if (!vi || vi === 'Chữ Hán HSK 1' || vi === 'Từ vựng tiếng Trung') {
+      const info = this.getDictInfo(hz, py);
+      if (info) {
+        py = py || info.py;
+        vi = info.vi;
+        type = type || info.type;
+      }
+    }
+
     const hzEl = this.tooltipEl.querySelector('#hz-tip-hanzi');
     const pyEl = this.tooltipEl.querySelector('#hz-tip-pinyin');
     const viEl = this.tooltipEl.querySelector('#hz-tip-meaning');
@@ -297,7 +441,7 @@ window.HanziLookup = {
 
     if (hzEl) hzEl.textContent = hz;
     if (pyEl) pyEl.textContent = py;
-    if (viEl) viEl.textContent = vi || 'Chữ Hán HSK 1';
+    if (viEl) viEl.textContent = vi || 'Từ vựng HSK 1';
     if (typeEl) {
       if (type) {
         typeEl.textContent = type;
@@ -310,10 +454,8 @@ window.HanziLookup = {
     this.tooltipEl.setAttribute('data-active-hz', hz);
     this.currentTarget = target;
 
-    // Định vị trí Tooltip trên đầu chữ Hán
     this.repositionTooltip();
 
-    // Hiệu ứng hiện
     this.tooltipEl.classList.remove('hidden');
     requestAnimationFrame(() => {
       this.tooltipEl.classList.remove('opacity-0', 'scale-95');
@@ -321,33 +463,26 @@ window.HanziLookup = {
     });
   },
 
-  /**
-   * Tính toán vị trí hiển thị chuẩn xác phía trên chữ Hán
-   */
   repositionTooltip() {
     if (!this.currentTarget || !this.tooltipEl) return;
 
     const rect = this.currentTarget.getBoundingClientRect();
     const tipRect = this.tooltipEl.getBoundingClientRect();
 
-    const tipWidth = tipRect.width || 240;
-    const tipHeight = tipRect.height || 100;
+    const tipWidth = tipRect.width || 280;
+    const tipHeight = tipRect.height || 110;
 
-    // Canh giữa theo chiều ngang của từ
     let left = rect.left + (rect.width / 2) - (tipWidth / 2);
 
-    // Không để tràn ra ngoài viền trái/phải màn hình
     const margin = 12;
     if (left < margin) left = margin;
     if (left + tipWidth > window.innerWidth - margin) {
       left = window.innerWidth - margin - tipWidth;
     }
 
-    // Canh phía trên từ chữ Hán (khoảng cách 10px)
     let top = rect.top - tipHeight - 10;
     let flipBottom = false;
 
-    // Nếu sát mép trên màn hình (< 10px), tự động lật xuống phía dưới chữ
     if (top < 10) {
       top = rect.bottom + 10;
       flipBottom = true;
@@ -363,9 +498,6 @@ window.HanziLookup = {
     }
   },
 
-  /**
-   * Đóng Tooltip
-   */
   hideTooltip() {
     clearTimeout(this.hoverTimer);
     clearTimeout(this.hideTimer);
@@ -374,12 +506,16 @@ window.HanziLookup = {
       this.tooltipEl.classList.remove('opacity-100', 'scale-100');
       this.tooltipEl.classList.add('opacity-0', 'scale-95');
       setTimeout(() => {
-        if (this.tooltipEl.classList.contains('opacity-0')) {
+        if (this.tooltipEl && this.tooltipEl.classList.contains('opacity-0')) {
           this.tooltipEl.classList.add('hidden');
         }
       }, 180);
     }
 
+    if (this.currentSyncId) {
+      this.unhighlightSyncedPair(this.currentSyncId);
+      this.currentSyncId = null;
+    }
     if (this.currentTarget) {
       this.currentTarget.classList.remove('hz-active');
       this.currentTarget = null;

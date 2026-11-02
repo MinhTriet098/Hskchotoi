@@ -454,3 +454,51 @@ img {
     display: none !important;
   }
 }
+
+
+/* ==========================================================================
+   ĐỒNG BỘ 2 CHIỀU TƯƠNG TÁC HÁN TỰ <-> PINYIN & TRA CỨU TỪ ĐIỂN
+   ========================================================================== */
+.sync-word {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 1px 3px;
+  margin: 0 1.5px;
+  transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: underline dotted rgba(148, 163, 184, 0.35);
+  text-underline-offset: 4px;
+}
+
+.sync-word:hover,
+.sync-word.sync-word-active {
+  text-decoration: none !important;
+  transform: translateY(-1.5px) scale(1.05);
+  z-index: 30;
+}
+
+/* Kiểu nổi bật cho Chữ Hán (Tone vàng cam rực rỡ) */
+.sync-word-hz:hover,
+.sync-word-hz.sync-word-active {
+  background-color: rgba(245, 158, 11, 0.28) !important;
+  color: #fef08a !important;
+  outline: 2px solid rgba(245, 158, 11, 0.85) !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+}
+
+/* Kiểu nổi bật cho Pinyin (Tone xanh Cyan neon hiện đại) */
+.sync-word-py:hover,
+.sync-word-py.sync-word-active {
+  background-color: rgba(6, 182, 212, 0.3) !important;
+  color: #67e8f9 !important;
+  outline: 2px solid rgba(6, 182, 212, 0.85) !important;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.45) !important;
+}
+
+/* Ký tự dấu câu */
+.punct-char {
+  display: inline;
+  color: inherit;
+  opacity: 0.85;
+}

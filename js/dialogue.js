@@ -532,17 +532,32 @@ function renderDialogueLine(line, index, roles) {
           </div>
         </div>
 
-        <!-- Hán tự (Hanzi) -->
-        <p class="text-xl sm:text-2xl font-bold tracking-wide text-white leading-relaxed chinese-font dialogue-line-hanzi">
-          ${line.hanzi}
-        </p>
-
-        <!-- Phiên âm Pinyin (Bật/Tắt) -->
-        ${window.DialogueState.showPinyin ? `
-          <p class="text-xs sm:text-sm font-semibold text-cyan-400 mt-1 font-mono tracking-wide">
-            ${line.pinyin}
-          </p>
-        ` : ''}
+        <!-- Hán tự (Hanzi) & Phiên âm Pinyin đồng bộ tra cứu 2 chiều -->
+        ${(() => {
+          if (window.HanziLookup && typeof window.HanziLookup.renderSyncedSentence === 'function') {
+            const synced = window.HanziLookup.renderSyncedSentence(line.hanzi, line.pinyin, `dlg-line-${index}`);
+            return `
+              <p class="text-xl sm:text-2xl font-bold tracking-wide text-white leading-relaxed chinese-font dialogue-line-hanzi">
+                ${synced.hzHtml}
+              </p>
+              ${window.DialogueState.showPinyin ? `
+                <p class="text-xs sm:text-sm font-semibold text-cyan-400 mt-1 font-mono tracking-wide">
+                  ${synced.pyHtml}
+                </p>
+              ` : ''}
+            `;
+          }
+          return `
+            <p class="text-xl sm:text-2xl font-bold tracking-wide text-white leading-relaxed chinese-font dialogue-line-hanzi">
+              ${line.hanzi}
+            </p>
+            ${window.DialogueState.showPinyin ? `
+              <p class="text-xs sm:text-sm font-semibold text-cyan-400 mt-1 font-mono tracking-wide">
+                ${line.pinyin}
+              </p>
+            ` : ''}
+          `;
+        })()}
 
         <!-- Bản dịch tiếng Việt (Bật/Tắt) -->
         ${window.DialogueState.showTranslation ? `

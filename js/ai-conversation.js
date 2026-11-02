@@ -554,9 +554,24 @@
               </button>
             </div>
 
-            <!-- Câu Hán tự to nét -->
-            <p class="text-xl sm:text-2xl font-black chinese-font leading-snug tracking-wide">${msg.hanzi}</p>
-            <p class="text-xs font-mono font-bold ${isAI ? 'text-cyan-300' : 'text-blue-100'}">${msg.pinyin}</p>
+            <!-- Câu Hán tự to nét & Phiên âm Pinyin liên kết 2 chiều tra từ -->
+            ${(() => {
+              if (window.HanziLookup && typeof window.HanziLookup.renderSyncedSentence === 'function') {
+                const synced = window.HanziLookup.renderSyncedSentence(msg.hanzi, msg.pinyin, `ai-msg-${idx}`, isAI);
+                return `
+                  <p class="text-xl sm:text-2xl font-black chinese-font leading-snug tracking-wide text-white select-text">
+                    ${synced.hzHtml}
+                  </p>
+                  <p class="text-xs sm:text-sm font-mono font-bold ${isAI ? 'text-cyan-300' : 'text-blue-100'} select-text pt-0.5">
+                    ${synced.pyHtml}
+                  </p>
+                `;
+              }
+              return `
+                <p class="text-xl sm:text-2xl font-black chinese-font leading-snug tracking-wide">${msg.hanzi}</p>
+                <p class="text-xs font-mono font-bold ${isAI ? 'text-cyan-300' : 'text-blue-100'}">${msg.pinyin}</p>
+              `;
+            })()}
             <p class="text-[11px] ${isAI ? 'text-slate-400' : 'text-blue-100/90'} italic pt-0.5 border-t ${isAI ? 'border-slate-800' : 'border-blue-500/50'}">
               "${msg.vi}"
             </p>
