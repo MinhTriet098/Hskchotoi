@@ -436,7 +436,8 @@
       turnIndex: 0,
       chatHistory: [],
       isRecording: false,
-      selectedBranch: convoData.turns[0]?.expectedReplies[0] || null,
+      showHints: true, // Cho phép người dùng ẩn/hiện gợi ý hướng trả lời
+      selectedBranch: null, // Để null để AI tự động nhận diện câu người dùng nói
       speechRec: null
     };
   }
@@ -666,57 +667,78 @@
       return;
     }
 
-    const branch = currentSession.selectedBranch || currentTurn.expectedReplies[0];
+    const branch = currentSession.selectedBranch;
 
     panel.innerHTML = `
-      <!-- Gợi ý các nhánh câu trả lời thực tế -->
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-400 font-bold flex items-center gap-1.5">
-            <span>💡</span> Chọn hướng trả lời của bạn:
+      <!-- Thanh điều khiển: Chế độ Nói Tự Do & Bật/Tắt Hướng Trả Lời -->
+      <div class="flex items-center justify-between text-xs pb-0.5 flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1.5 text-[11px] shadow-sm">
+            <span class="animate-pulse">✨</span> 
+            <span>Nói tự do: AI tự hiểu &amp; bắt lỗi</span>
           </span>
-          <span class="text-[11px] text-amber-400">Bấm câu bạn muốn nói rồi giữ Mic</span>
+          <span class="text-slate-400 text-[11px] hidden sm:inline">Nói bất kỳ câu tiếng Trung nào phù hợp, không bắt buộc chọn trước!</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          ${currentTurn.expectedReplies.map((r, idx) => {
-            const isSelected = branch && branch.hanzi === r.hanzi;
-            return `
-              <button onclick="selectConversationBranch(${idx})" class="p-3 rounded-2xl text-left border transition-all ${isSelected ? 'bg-blue-950/80 border-blue-500 text-white shadow-md shadow-blue-500/20' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-black chinese-font text-white">${r.hanzi}</span>
-                  <span class="text-[10px] font-mono text-cyan-300 font-bold">${r.pinyin}</span>
-                </div>
-                <div class="text-[11px] text-slate-400 mt-0.5 italic">"${r.vi}"</div>
-              </button>
-            `;
-          }).join('')}
-        </div>
+        <!-- Nút Bật/Tắt hướng trả lời (Option theo yêu cầu của bạn) -->
+        <button onclick="toggleConversationHints()" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 flex items-center gap-1.5 font-bold transition-all text-[11px] shadow-sm" title="Bật hoặc ẩn các câu gợi ý hướng trả lời">
+          <span>💡</span>
+          <span>${currentSession.showHints ? 'Ẩn gợi ý câu trả lời' : 'Hiện gợi ý câu trả lời'}</span>
+          <span class="text-[9px] px-1 rounded bg-slate-900 ${currentSession.showHints ? 'text-amber-400 font-black' : 'text-slate-500'}">
+            ${currentSession.showHints ? 'BẬT' : 'ẨN'}
+          </span>
+        </button>
       </div>
 
-      <!-- Khung Thu Âm & Bắt Lỗi Phát Âm -->
+      <!-- Khung gợi ý các hướng trả lời (Hiển thị linh hoạt khi người dùng muốn xem mẫu) -->
+      ${currentSession.showHints ? `
+        <div class="space-y-1.5 animate-fadeIn">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${currentTurn.expectedReplies.map((r, idx) => {
+              const isSelected = branch && branch.hanzi === r.hanzi;
+              return `
+                <button onclick="selectConversationBranch(${idx})" class="p-3 rounded-2xl text-left border transition-all ${isSelected ? 'bg-blue-950/80 border-blue-500 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/50' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-black chinese-font text-white">${r.hanzi}</span>
+                    <span class="text-[10px] font-mono text-cyan-300 font-bold">${r.pinyin}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5 italic">"${r.vi}"</div>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Khung Thu Âm & Bắt Lỗi Phát Âm Tự Động -->
       <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3.5">
           <!-- Nút Micro lớn -->
-          <button id="convo-mic-btn" onclick="toggleConversationRecording()" class="w-14 h-14 rounded-full ${currentSession.isRecording ? 'bg-red-600 animate-pulse ring-8 ring-red-500/30' : 'bg-gradient-to-tr from-blue-600 to-indigo-600 hover:scale-105 active:scale-95'} text-white flex items-center justify-center text-2xl shadow-xl transition-all flex-shrink-0">
+          <button id="convo-mic-btn" onclick="toggleConversationRecording()" class="w-14 h-14 rounded-full ${currentSession.isRecording ? 'bg-red-600 animate-pulse ring-8 ring-red-500/30' : 'bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-600 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/25'} text-white flex items-center justify-center text-2xl shadow-xl transition-all flex-shrink-0">
             ${currentSession.isRecording ? '⏹️' : '🎙️'}
           </button>
           <div>
             <p id="convo-mic-status" class="text-xs font-bold text-white">
-              ${currentSession.isRecording ? 'Đang lắng nghe giọng bạn nói...' : 'Bấm Micro và đọc to câu tiếng Trung ở trên'}
+              ${currentSession.isRecording ? 'Đang lắng nghe... Hãy nói to câu tiếng Trung của bạn!' : 'Bấm Micro và trả lời bằng tiếng Trung'}
             </p>
             <p class="text-[11px] text-slate-400 mt-0.5">
-              Mục tiêu đọc: <b class="text-cyan-300 font-mono">${branch ? branch.hanzi : ''}</b> (${branch ? branch.pinyin : ''})
+              ${branch ? `Mục tiêu mẫu: <b class="text-cyan-300 font-mono">${branch.hanzi}</b> (${branch.pinyin})` : `✨ Nói tự nhiên: AI sẽ tự nghe, nhận diện và đối đáp lại bạn!`}
             </p>
           </div>
         </div>
 
         <!-- Các nút bổ trợ: Nghe câu mẫu, Bỏ qua / Tiếp tục -->
         <div class="flex items-center gap-2 self-end sm:self-auto">
-          <button onclick="speakChinese('${branch ? branch.hanzi : ''}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm">
-            <span>🔊</span> Nghe mẫu
-          </button>
+          ${branch ? `
+            <button onclick="speakChinese('${branch.hanzi}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm" title="Nghe đọc mẫu câu này">
+              <span>🔊</span> Nghe mẫu
+            </button>
+          ` : (currentTurn.expectedReplies[0] ? `
+            <button onclick="speakChinese('${currentTurn.expectedReplies[0].hanzi}')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all shadow-sm" title="Nghe câu trả lời gợi ý">
+              <span>🔊</span> Gợi ý
+            </button>
+          ` : '')}
           <button onclick="manualPassConversationTurn()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-950/80 hover:border-emerald-500/50 text-slate-400 hover:text-emerald-300 text-xs font-bold border border-slate-700 transition-all" title="Bỏ qua thu âm và cho câu này đúng">
             <span>Bỏ qua ▶</span>
           </button>
@@ -729,12 +751,22 @@
     `;
   }
 
+  function toggleConversationHints() {
+    currentSession.showHints = !currentSession.showHints;
+    renderInputPanel();
+  }
+
   function selectConversationBranch(idx) {
     const convoData = REAL_CONVERSATIONS.find(c => c.lessonId === currentSession.lessonId);
     const currentTurn = convoData?.turns[currentSession.turnIndex];
     if (!currentTurn) return;
 
-    currentSession.selectedBranch = currentTurn.expectedReplies[idx];
+    // Nếu đã chọn rồi bấm lại thì bỏ chọn để trở về chế độ hoàn toàn tự do
+    if (currentSession.selectedBranch && currentSession.selectedBranch.hanzi === currentTurn.expectedReplies[idx].hanzi) {
+      currentSession.selectedBranch = null;
+    } else {
+      currentSession.selectedBranch = currentTurn.expectedReplies[idx];
+    }
     renderInputPanel();
   }
 
@@ -810,50 +842,130 @@
   /**
    * Chẩn đoán và bắt lỗi phát âm từ chuỗi người học nói
    */
+  /**
+   * Chẩn đoán và nhận diện thông minh đa nhánh & nói tự do từ âm thanh người học
+   */
   function handleUserSpokenResult(spokenText) {
     const convoData = REAL_CONVERSATIONS.find(c => c.lessonId === currentSession.lessonId);
     const currentTurn = convoData?.turns[currentSession.turnIndex];
     if (!currentTurn) return;
 
-    const branch = currentSession.selectedBranch || currentTurn.expectedReplies[0];
-    const targetHanzi = branch.hanzi;
-    const targetPinyin = branch.pinyin;
+    const cleanSpoken = (spokenText || "").replace(/[^\u4e00-\u9fa5]/g, "");
+    if (!cleanSpoken) {
+      const box = document.getElementById('convo-diagnose-result-box');
+      if (box) {
+        box.classList.remove('hidden');
+        box.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-amber-950/60 border border-amber-600/70 text-amber-200 text-xs">
+            ⚠️ <b>Chưa nhận diện được âm thanh:</b> Trình duyệt không nghe rõ chữ Hán nào. Vui lòng bấm Micro và đọc to, rõ ràng hơn nhé!
+          </div>
+        `;
+      }
+      return;
+    }
 
-    // Sử dụng module chẩn đoán lỗi âm vị học bách khoa nếu có
-    let diagnosis = null;
-    if (typeof window.diagnoseSpeechDetails === 'function') {
-      try {
-        diagnosis = window.diagnoseSpeechDetails(targetHanzi, targetPinyin, spokenText);
-      } catch (e) {
-        console.warn("Lỗi diagnoseSpeechDetails:", e);
+    // 1. So khớp thông minh với TẤT CẢ các nhánh gợi ý trong lượt này (Không ép buộc người dùng phải chọn trước)
+    let bestBranch = null;
+    let bestScore = 0;
+    let bestDiagnosis = null;
+
+    // Nếu người dùng chủ động click chọn 1 nhánh cụ thể, ưu tiên nhánh đó
+    const candidateReplies = currentSession.selectedBranch 
+      ? [currentSession.selectedBranch, ...currentTurn.expectedReplies.filter(r => r.hanzi !== currentSession.selectedBranch.hanzi)]
+      : currentTurn.expectedReplies;
+
+    for (const r of candidateReplies) {
+      let diag = null;
+      if (typeof window.diagnoseSpeechDetails === 'function') {
+        try { diag = window.diagnoseSpeechDetails(r.hanzi, r.pinyin, spokenText); } catch(e) {}
+      }
+      const cleanR = r.hanzi.replace(/[^\u4e00-\u9fa5]/g, "");
+
+      let matchScore = 0;
+      if (cleanSpoken && cleanR) {
+        if (cleanR === cleanSpoken) {
+          matchScore = 100;
+        } else if (cleanR.includes(cleanSpoken) || cleanSpoken.includes(cleanR)) {
+          // Trùng một phần hoàn hảo (Ví dụ người dùng nói "谢谢老师" cho câu gợi ý "谢谢老师，再见！")
+          const overlap = Math.min(cleanSpoken.length, cleanR.length) / Math.max(cleanSpoken.length, cleanR.length);
+          matchScore = Math.max(Math.round(overlap * 100), 88);
+        } else {
+          // Đếm số lượng chữ Hán trùng khớp
+          let commonCount = 0;
+          for (const ch of cleanSpoken) {
+            if (cleanR.includes(ch)) commonCount++;
+          }
+          if (commonCount > 0) {
+            matchScore = Math.round((commonCount / Math.max(cleanSpoken.length, cleanR.length)) * 82);
+          }
+        }
+      }
+
+      const totalScore = diag ? Math.max(diag.score, matchScore) : matchScore;
+      if (totalScore > bestScore) {
+        bestScore = totalScore;
+        bestBranch = r;
+        bestDiagnosis = diag;
       }
     }
 
-    // Nếu không có, so sánh trực tiếp
-    const cleanTarget = targetHanzi.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
-    const cleanSpoken = (spokenText || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
-    const isPassed = diagnosis ? diagnosis.isPassed : (cleanSpoken.includes(cleanTarget) || cleanTarget.includes(cleanSpoken));
-    const score = diagnosis ? diagnosis.score : (isPassed ? 95 : 55);
+    // 2. Tra cứu Pinyin & Nghĩa tiếng Việt cho câu người dùng thực tế vừa nói
+    const spokenPy = (function() {
+      if (bestBranch && (cleanSpoken === bestBranch.hanzi.replace(/[^\u4e00-\u9fa5]/g, "") || bestScore >= 80)) {
+        return bestBranch.pinyin;
+      }
+      if (window.PINYIN_MAP) {
+        return Array.from(cleanSpoken).map(c => window.PINYIN_MAP[c] || c).join(' ');
+      }
+      return '';
+    })();
 
-    // Hiển thị bảng bắt lỗi chi tiết
-    renderDiagnosisBox(targetHanzi, targetPinyin, spokenText, score, isPassed, diagnosis);
+    const spokenVi = (function() {
+      if (bestBranch && bestScore >= 70) {
+        return bestBranch.vi;
+      }
+      const dict = window.HANZI_HOVER_DICT || {};
+      if (dict[cleanSpoken]) return dict[cleanSpoken].vi;
+      let wordsVi = [];
+      for (const ch of cleanSpoken) {
+        if (dict[ch]) wordsVi.push(dict[ch].vi);
+      }
+      return wordsVi.length ? wordsVi.join(', ') : 'Câu nói tự do của bạn';
+    })();
+
+    // 3. Đánh giá vượt qua:
+    // - Khớp với 1 trong các câu gợi ý >= 60 điểm -> ĐẠT!
+    // - Hoặc người dùng nói được câu tiếng Trung có nghĩa (>= 2 chữ Hán) -> ĐẠT!
+    const isPassed = (bestScore >= 60) || (cleanSpoken.length >= 2 && bestScore >= 40);
+    const finalScore = isPassed ? Math.max(bestScore, 90) : bestScore;
+
+    const targetDisplayHz = (bestBranch && bestScore >= 60) ? bestBranch.hanzi : cleanSpoken;
+    const targetDisplayPy = (bestBranch && bestScore >= 60) ? bestBranch.pinyin : spokenPy;
+
+    renderDiagnosisBox(targetDisplayHz, targetDisplayPy, spokenText, finalScore, isPassed, bestDiagnosis, spokenVi, bestBranch);
 
     if (isPassed) {
-      // Thành công! Thêm vào lịch sử chat
       setTimeout(() => {
+        // Thêm vào chat: ghi nhận đúng câu người dùng đã nói!
+        const userHanziToRecord = (cleanSpoken.length >= 2 && !targetDisplayHz.includes(cleanSpoken)) ? cleanSpoken : targetDisplayHz;
+        const userPyToRecord = spokenPy || targetDisplayPy;
+        const userViToRecord = spokenVi || (bestBranch ? bestBranch.vi : 'Lời đáp của bạn');
+
         currentSession.chatHistory.push({
           sender: 'user',
-          hanzi: targetHanzi,
-          pinyin: targetPinyin,
-          vi: branch.vi,
-          score: score,
+          hanzi: userHanziToRecord,
+          pinyin: userPyToRecord,
+          vi: userViToRecord,
+          score: finalScore,
           passed: true
         });
 
         currentSession.turnIndex++;
+        currentSession.selectedBranch = null; // Trả về tự do cho lượt thoại kế tiếp
         renderChatMessages();
+        renderInputPanel();
 
-        // AI đối đáp tiếp
+        // AI trả lời tiếp theo
         setTimeout(() => {
           triggerAITurn();
         }, 800);
@@ -864,7 +976,7 @@
   /**
    * Render hộp chẩn đoán lỗi phát âm chi tiết
    */
-  function renderDiagnosisBox(targetHanzi, targetPinyin, spokenText, score, isPassed, diagnosis) {
+  function renderDiagnosisBox(targetHanzi, targetPinyin, spokenText, score, isPassed, diagnosis, spokenVi = '', matchedBranch = null) {
     const box = document.getElementById('convo-diagnose-result-box');
     if (!box) return;
 
@@ -888,28 +1000,34 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 font-bold ${isPassed ? 'text-emerald-300' : 'text-rose-300'}">
             <span>${isPassed ? '🎉' : '⚠️'}</span>
-            <span>${isPassed ? 'Phát âm rất tốt! (+10đ)' : 'Phát âm chưa chuẩn, cần luyện lại:'}</span>
+            <span>${isPassed ? 'AI hiểu và nhận diện xuất sắc! (+10đ)' : 'AI chưa nghe rõ câu này, bạn thử nói lại nhé:'}</span>
           </div>
-          <span class="px-2 py-0.5 rounded-full font-mono font-black ${isPassed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+          <span class="px-2.5 py-0.5 rounded-full font-mono font-black ${isPassed ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
             Điểm: ${score}/100
           </span>
         </div>
 
-        <div class="text-slate-300">
-          <span>Bạn vừa đọc:</span> <b class="text-white">"${spokenText || '(Chưa nghe rõ)'}"</b>
-          <span class="mx-1">•</span>
-          <span>Mẫu chuẩn:</span> <b class="text-cyan-300 font-mono">${targetHanzi}</b>
+        <div class="text-slate-300 space-y-1">
+          <div>
+            <span>Bạn vừa nói:</span> <b class="text-white text-sm">"${spokenText || '(Chưa nghe rõ)'}"</b>
+            ${spokenVi ? `<span class="text-emerald-300 italic ml-1">("${spokenVi}")</span>` : ''}
+          </div>
+          ${matchedBranch ? `
+            <div class="text-slate-400 text-[11px]">
+              <span>Phù hợp với hướng trả lời:</span> <b class="text-cyan-300 font-mono">${matchedBranch.hanzi}</b> <span class="italic">("${matchedBranch.vi}")</span>
+            </div>
+          ` : ''}
         </div>
 
         ${errorsHTML}
 
         ${!isPassed ? `
-          <div class="pt-1 flex items-center justify-end gap-2">
+          <div class="pt-1 flex items-center justify-end gap-2 flex-wrap">
             <button onclick="speakChinese('${targetHanzi}', 0.75)" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-xs flex items-center gap-1">
               🐢 Nghe mẫu chậm 0.75x
             </button>
             <button onclick="startConversationSpeech()" class="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-rose-600/30">
-              🎤 Bấm để đọc lại
+              🎤 Bấm để nói lại
             </button>
           </div>
         ` : ''}
@@ -963,3 +1081,5 @@
   window.restartConversation = restartConversation;
   window.switchConversationLesson = switchConversationLesson;
 })();
+
+  window.toggleConversationHints = toggleConversationHints;
