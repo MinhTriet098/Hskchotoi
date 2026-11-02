@@ -379,3 +379,78 @@ img {
 .animate-listening-progress {
   animation: listeningProgress 2.5s linear forwards;
 }
+
+
+/* ==============================================================
+   CẤU HÌNH IN ẤN CHUẨN KHỔ GIẤY A4 (PRINT & PDF EXPORT)
+   ============================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 8mm 10mm 8mm;
+  }
+
+  html, body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ẩn toàn bộ giao diện app khi in */
+  header, main, footer, 
+  #worksheet-modal, .fixed, .modal,
+  #voice-modal, #writing-modal, #memory-hub-modal, 
+  #dialogue-games-modal, #pinyin-modal, #radical-modal, 
+  #hover-card, #toast-container {
+    display: none !important;
+  }
+
+  /* Chỉ hiển thị duy nhất vùng tài liệu in ấn */
+  #printable-worksheet {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .worksheet-page {
+    width: 100% !important;
+    min-height: 275mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+  }
+
+  .worksheet-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .no-break-inside {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .mizige-print-cell {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Ẩn vùng in khi hiển thị màn hình thông thường */
+@media screen {
+  #printable-worksheet {
+    display: none !important;
+  }
+}

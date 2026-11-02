@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css">
 
   <!-- Custom CSS (Rice grid / Mễ tự cách, Ruby text, Tree branches) -->
-  <link rel="stylesheet" href="assets/css/custom.css?v=4.0">
+  <link rel="stylesheet" href="assets/css/custom.css?v=4.1">
 
   <!-- Hanzi Writer Library (Offline local + CDN fallback) -->
   <script src="libs/hanzi-writer.min.js"></script>
@@ -166,6 +166,10 @@
       <button onclick="openMemoryHub('meaning_quiz')" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/80 transition-colors flex items-center gap-1.5 text-purple-300 font-bold">
         <span>🧠</span> Luyện Nhớ (6 Trò)
       </button>
+      <span class="text-slate-700">|</span>
+      <button onclick="openPrintModal()" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold transition-all flex items-center gap-1.5 shadow-sm" title="Tải PDF hoặc In Vở Luyện Chữ (Ô Mễ) & Phiếu Bài Tập Tự Viết A4">
+        <span>🖨️</span> In / Tải PDF A4
+      </button>
     </div>
   </header>
 
@@ -275,6 +279,11 @@
           <button onclick="nextLesson()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white border border-blue-500 text-xs font-bold transition-all flex items-center gap-1 shadow-md shadow-blue-500/20">
             Bài tiếp
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <button onclick="openPrintModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white border border-emerald-400/40 text-xs font-black transition-all flex items-center gap-1.5 shadow-md shadow-emerald-600/20 active:scale-95" title="Tải PDF hoặc In Vở Luyện Chữ (Ô Mễ) & Phiếu Bài Tập Tự Viết A4">
+            <span>🖨️</span>
+            <span>In / Tải PDF A4</span>
           </button>
         </div>
       </div>
@@ -1371,6 +1380,7 @@
   <script src="js/family-speech.js?v=1.0"></script>
   <script src="js/hanzi-lookup.js?v=1.1"></script>
   <script src="js/translator.js?v=2.0"></script>
+  <script src="js/worksheet-generator.js?v=1.0"></script>
   <script src="js/app.js?v=3.7"></script>
 
   <script>
