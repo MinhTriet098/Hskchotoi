@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css">
 
   <!-- Custom CSS (Rice grid / Mễ tự cách, Ruby text, Tree branches) -->
-  <link rel="stylesheet" href="assets/css/custom.css?v=4.1">
+  <link rel="stylesheet" href="assets/css/custom.css?v=4.2">
 
   <!-- Hanzi Writer Library (Offline local + CDN fallback) -->
   <script src="libs/hanzi-writer.min.js"></script>
@@ -124,6 +124,11 @@
         <button onclick="openMemoryHub('meaning_quiz')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/70 hover:bg-purple-900 border border-purple-700/70 text-purple-300 hover:text-white text-xs font-bold transition-all shadow-sm">
           <span>🧠</span>
           <span>Luyện Nhớ (6 Trò)</span>
+        </button>
+
+        <button onclick="openRealConversationModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white text-xs font-black transition-all shadow-md shadow-emerald-500/20 active:scale-95" title="Đối thoại thực tế với bạn người bản xứ & Sửa lỗi phát âm tức thì">
+          <span>🗣️</span>
+          <span>Đàm Thoại AI Thực Tế</span>
         </button>
 
         <!-- Profile Badge Cá Nhân -->
@@ -312,6 +317,12 @@
           <span class="text-cyan-400">🌐</span>
           <span>Dịch & Luyện Nói</span>
           <span class="px-2 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">AI Coach</span>
+        </button>
+
+        <button onclick="openRealConversationModal()" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-white hover:bg-slate-800" title="Trò chuyện đàm thoại thực tế như người thật & Bắt lỗi phát âm tức thì">
+          <span class="text-rose-400">🗣️</span>
+          <span>Đàm Thoại AI</span>
+          <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">Thực Chiến</span>
         </button>
       </div>
 
@@ -1380,8 +1391,9 @@
   <script src="js/family-speech.js?v=1.0"></script>
   <script src="js/hanzi-lookup.js?v=1.1"></script>
   <script src="js/translator.js?v=2.0"></script>
-  <script src="js/worksheet-generator.js?v=1.0"></script>
-  <script src="js/app.js?v=3.7"></script>
+  <script src="js/worksheet-generator.js?v=2.0"></script>
+  <script src="js/ai-conversation.js?v=1.0"></script>
+  <script src="js/app.js?v=3.8"></script>
 
   <script>
     // Xử lý Modal LAN & QR Code

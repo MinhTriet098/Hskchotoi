@@ -1,13 +1,11 @@
 /**
  * ==============================================================================
- * XƯỞNG IN VỞ LUYỆN CHỮ & BÀI TẬP TỰ VIẾT A4 (WORKSHEET GENERATOR)
+ * XƯỞNG IN VỞ LUYỆN CHỮ & BÀI TẬP TỰ VIẾT A4 (WORKSHEET GENERATOR) - V2.0 TỐI ƯU
  * ==============================================================================
- * Hỗ trợ xuất file PDF và In ấn trực tiếp khổ giấy A4 dọc tiêu chuẩn:
- *  1. ✍️ Vở luyện chữ Hán Ô Mễ Tự Cách (米字格) / Ô Điền (田字格) có chữ đồ nét
- *  2. 🔤 Phiếu bài tập tự điền Pinyin có dấu thanh điệu
- *  3. 🇻🇳 Phiếu bài tập tự dịch nghĩa tiếng Việt & từ loại
- *  4. 🀄 Phiếu kiểm tra trí nhớ: Nhìn tiếng Việt tự viết Chữ Hán
- *  5. 💬 Vở luyện chép câu thoại & đàm thoại thực tế chuẩn SGK
+ * Định dạng chuẩn A4 (210mm x 297mm):
+ *  - Khoảng cách lề: Trên/Dưới: 1.7cm | Trái/Phải: 2.0cm
+ *  - Tối ưu 100% diện tích: Các ô Mễ trải kín toàn bộ chiều ngang hàng (13-14 ô)
+ *  - Tự động gom vừa vặn 13-15 từ vào đúng 1 TRANG A4 duy nhất, không rớt trang thừa
  * ==============================================================================
  */
 
@@ -20,7 +18,7 @@
     lessonId: 1,
     gridColor: 'red',   // 'red' (Đỏ truyền thống 红米格) | 'gray' (Đen xám tiết kiệm mực)
     gridStyle: 'mizige', // 'mizige' (Ô Mễ 米) | 'tianzige' (Ô Điền 田) | 'kuaige' (Ô Vuông 口)
-    gridCount: 8,       // 6, 8, hoặc 10 ô luyện viết mỗi dòng
+    gridCount: 14,      // 12, 14, hoặc 16 ô luyện viết mỗi dòng (mặc định 14 ô trải kín hàng)
     includeWatermark: true, // Có ô chữ mờ để đồ nét hay không
     includeHeader: true,    // Có in khung Tên / Ngày / Điểm hay không
     includeAnswerKey: false,// Có in trang đáp án ở cuối hay không
@@ -38,7 +36,6 @@
       window.WORKSHEET_CONFIG.template = initialTemplate;
     }
 
-    // Mặc định chọn tất cả từ của bài hiện tại
     const currentWords = getLessonWords(hubLessonId);
     window.WORKSHEET_CONFIG.selectedVocabIds = currentWords.map(w => w.id);
 
@@ -62,17 +59,11 @@
     if (m) m.classList.add('hidden');
   }
 
-  /**
-   * Lấy danh sách từ vựng theo bài
-   */
   function getLessonWords(lessonId) {
     if (!window.VOCAB_DATABASE) return [];
     return window.VOCAB_DATABASE.filter(w => w.lesson_id === lessonId);
   }
 
-  /**
-   * Lấy thông tin bài học
-   */
   function getLessonInfo(lessonId) {
     if (window.HSK_LESSONS) {
       const found = window.HSK_LESSONS.find(l => l.id === lessonId);
@@ -99,8 +90,8 @@
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] border border-emerald-500/40">XƯỞNG TẠO BÀI TẬP A4</span>
-                <span class="text-xs text-slate-400">In Trực Tiếp / Xuất PDF</span>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-extrabold text-[10px] border border-emerald-500/40">CHUẨN KHỔ A4 (LỀ TRÊN DƯỚI 1.7CM - TRÁI PHẢI 2.0CM)</span>
+                <span class="text-xs text-slate-400">Tối ưu 100% diện tích</span>
               </div>
               <h3 class="text-base font-black text-white mt-0.5">Vở Luyện Chữ & Phiếu Bài Tập Tự Viết Trên Giấy</h3>
             </div>
@@ -117,10 +108,10 @@
           </div>
         </div>
 
-        <!-- Thân Modal: Chia 2 Cột (Trái: Tùy chọn điều khiển, Phải: Preview A4 sống động) -->
+        <!-- Thân Modal: Chia 2 Cột -->
         <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
           
-          <!-- Cột Trái: Bảng điều khiển cấu hình (4 cột trên màn hình lớn) -->
+          <!-- Cột Trái: Bảng điều khiển cấu hình (4 cột) -->
           <div class="lg:col-span-4 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-slate-800/80 bg-slate-950/40 overflow-y-auto space-y-4" id="worksheet-controls-panel">
             <!-- Render động bằng renderWorksheetControls() -->
           </div>
@@ -129,9 +120,9 @@
           <div class="lg:col-span-8 p-4 sm:p-6 bg-slate-950 overflow-y-auto flex flex-col items-center">
             <div class="w-full flex items-center justify-between pb-3 text-xs text-slate-400">
               <span class="font-bold flex items-center gap-1.5">
-                <span>👁️</span> Xem trước bản in A4 (Tỷ lệ 100%)
+                <span>👁️</span> Xem trước bản in A4 (Chuẩn lề 1.7cm x 2.0cm)
               </span>
-              <span id="worksheet-page-count-badge" class="px-2 py-0.5 rounded-md bg-slate-800 text-cyan-300 font-mono font-bold">
+              <span id="worksheet-page-count-badge" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-mono font-bold">
                 1 Trang A4
               </span>
             </div>
@@ -184,8 +175,8 @@
           <button onclick="updateWorksheetOption('template', 'mizige')" class="p-3 rounded-2xl text-left border transition-all flex items-start gap-3 ${cfg.template === 'mizige' ? 'bg-emerald-950/50 border-emerald-500 text-white shadow-md shadow-emerald-500/10' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}">
             <span class="text-xl">✍️</span>
             <div>
-              <p class="text-xs font-extrabold text-white">Vở Luyện Chữ Hán (Ô Mễ Tự Cách)</p>
-              <p class="text-[11px] text-slate-400 mt-0.5">Chữ mẫu + chữ mờ đồ nét + hàng ô Mễ đỏ để cầm bút viết tay chuẩn nét.</p>
+              <p class="text-xs font-extrabold text-white">Vở Luyện Chữ Hán (Ô Mễ Tự Cách - Tràn Hàng)</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Trải kín 14 ô Mễ đỏ/xám ngang hàng. Chữ mẫu + chữ mờ đồ nét + đầy đủ ô trống.</p>
             </div>
           </button>
 
@@ -194,7 +185,7 @@
             <span class="text-xl">🔤</span>
             <div>
               <p class="text-xs font-extrabold text-white">Phiếu Tự Điền Pinyin (Kèm Thanh Điệu)</p>
-              <p class="text-[11px] text-slate-400 mt-0.5">Cho chữ Hán, chừa 4 dòng kẻ để tự tay viết Pinyin có dấu thanh điệu.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Cho chữ Hán, chừa dòng kẻ ngang để tự tay viết Pinyin có dấu thanh điệu.</p>
             </div>
           </button>
 
@@ -221,7 +212,7 @@
             <span class="text-xl">💬</span>
             <div>
               <p class="text-xs font-extrabold text-white">Vở Luyện Chép Câu Thoại & Hội Thoại SGK</p>
-              <p class="text-[11px] text-slate-400 mt-0.5">In câu hội thoại mẫu chuẩn SGK + 2 dòng kẻ ngang để chép cả câu.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">In câu hội thoại mẫu chuẩn SGK + 2 dòng kẻ ngang thoáng để chép cả câu.</p>
             </div>
           </button>
 
@@ -264,18 +255,6 @@
             </div>
           </div>
 
-          <!-- Số ô trên một dòng -->
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400">Số ô luyện viết / dòng:</span>
-            <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-              ${[6, 8, 10].map(cnt => `
-                <button onclick="updateWorksheetOption('gridCount', ${cnt})" class="px-2.5 py-1 rounded-lg font-bold text-[11px] ${cfg.gridCount === cnt ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}">
-                  ${cnt} ô
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
           <!-- Chữ mờ đồ nét -->
           ${cfg.template === 'mizige' ? `
             <div class="flex items-center justify-between text-xs">
@@ -315,9 +294,6 @@
     `;
   }
 
-  /**
-   * Cập nhật tùy chọn cấu hình và vẽ lại Preview
-   */
   function updateWorksheetOption(key, val) {
     window.WORKSHEET_CONFIG[key] = val;
     if (key === 'lessonId') {
@@ -330,10 +306,6 @@
 
   /**
    * Tạo chuỗi SVG cho một ô Mễ / Điền / Vuông
-   * @param {string} style 'mizige' | 'tianzige' | 'kuaige'
-   * @param {string} color 'red' | 'gray'
-   * @param {string} content Chữ Hán hoặc rỗng
-   * @param {boolean} isWatermark Có phải chữ mờ đồ nét hay không
    */
   function buildGridCellHTML(style, color, content = '', isWatermark = false, isSample = false) {
     const isRed = color === 'red';
@@ -361,13 +333,14 @@
       `;
     }
 
+    // Ô kích thước 36px x 36px chuẩn mực, vừa khít 14 ô trên chiều rộng dòng kẻ A4
     return `
-      <div class="mizige-print-cell ${isSample ? 'sample-cell' : ''} ${isWatermark ? 'watermark-cell' : ''}" style="width: 40px; height: 40px; border: 1.5px solid ${borderColor}; position: relative; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; box-sizing: border-box; flex-shrink: 0;">
+      <div class="mizige-print-cell ${isSample ? 'sample-cell' : ''} ${isWatermark ? 'watermark-cell' : ''}" style="width: 36px; height: 36px; border: 1.5px solid ${borderColor}; position: relative; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; box-sizing: border-box; flex-shrink: 0;">
         <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 100 100">
           ${innerSvgLines}
         </svg>
         ${content ? `
-          <span style="position: relative; z-index: 2; font-family: 'LXGW WenKai Screen R', 'LXGW WenKai Screen', 'KaiTi', '楷体', 'STKaiti', serif; font-size: 26px; line-height: 1; color: ${charColor}; font-weight: ${isSample ? '700' : '400'}; user-select: none;">
+          <span style="position: relative; z-index: 2; font-family: 'LXGW WenKai Screen R', 'LXGW WenKai Screen', 'KaiTi', '楷体', 'STKaiti', serif; font-size: 24px; line-height: 1; color: ${charColor}; font-weight: ${isSample ? '700' : '400'}; user-select: none;">
             ${content}
           </span>
         ` : ''}
@@ -380,23 +353,23 @@
    */
   function buildPageHeaderHTML(lessonInfo, pageNum, totalPages, cfg) {
     return `
-      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div style="border-bottom: 2px solid #0f172a; padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
-          <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569;">
+          <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569;">
             Giáo Trình HSK 1 Chuẩn 3.0 • Vở Luyện Chữ & Bài Tập Tự Viết A4
           </div>
-          <h1 style="font-size: 16px; font-weight: 900; color: #0f172a; margin: 2px 0 0 0;">
-            Bài ${lessonInfo.id}: ${lessonInfo.title} <span style="font-size: 13px; font-weight: 500; color: #475569;">(${lessonInfo.title_vi || ''})</span>
+          <h1 style="font-size: 15px; font-weight: 900; color: #0f172a; margin: 1px 0 0 0;">
+            Bài ${lessonInfo.id}: ${lessonInfo.title} <span style="font-size: 12px; font-weight: 500; color: #475569;">(${lessonInfo.title_vi || ''})</span>
           </h1>
         </div>
 
-        <div style="text-align: right; font-size: 10px; font-weight: 600; color: #64748b;">
+        <div style="text-align: right; font-size: 9.5px; font-weight: 700; color: #64748b;">
           Trang ${pageNum} / ${totalPages}
         </div>
       </div>
 
       ${cfg.includeHeader ? `
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 10px; margin-bottom: 8px;">
           <div><b>Họ và tên:</b> ..............................................................</div>
           <div><b>Ngày luyện:</b> ..... / ..... / 202...</div>
           <div><b>Điểm số:</b> .......... / 100</div>
@@ -405,16 +378,29 @@
     `;
   }
 
-  /**
-   * Tạo Footer trang giấy A4
-   */
   function buildPageFooterHTML() {
     return `
-      <div style="border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 12px; display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-        <span>HiHSK 3.0 • Hệ Thống Tự Học Tiếng Trung Toàn Diện</span>
+      <div style="border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: 6px; display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+        <span>HiHSK 3.0 • Vở Luyện Viết Khổ A4 (Lề: 1.7cm x 2.0cm)</span>
         <span>Học - Luyện - Viết Tay Mỗi Ngày</span>
       </div>
     `;
+  }
+
+  /**
+   * Phân chia danh sách thành các trang A4 cân đối, chống trang mồ côi
+   */
+  function paginateItems(items, maxPerSingle = 15) {
+    if (items.length <= maxPerSingle) {
+      // Toàn bộ vừa vặn đúng 1 trang A4!
+      return [items];
+    }
+    // Nếu lớn hơn, chia đều thành 2 trang (ví dụ 17 từ -> 9 trang 1, 8 trang 2)
+    const mid = Math.ceil(items.length / 2);
+    return [
+      items.slice(0, mid),
+      items.slice(mid)
+    ];
   }
 
   /**
@@ -429,44 +415,71 @@
     const lessonInfo = getLessonInfo(cfg.lessonId);
     const words = getLessonWords(cfg.lessonId);
 
+    // Kích thước cố định khổ A4 với padding chuẩn: Trên/Dưới 1.7cm, Trái/Phải 2.0cm
+    const pageBoxStyle = `
+      width: 210mm; 
+      min-height: 297mm; 
+      background: #ffffff; 
+      padding: 1.7cm 2.0cm; 
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); 
+      border-radius: 4px; 
+      box-sizing: border-box; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+    `;
+
     let pagesHTML = [];
 
     // =========================================================================
-    // TEMPLATE 1: VỞ LUYỆN CHỮ Ô MỄ (米字格)
+    // TEMPLATE 1: VỞ LUYỆN CHỮ Ô MỄ TRÀN HÀNG (米字格)
     // =========================================================================
     if (cfg.template === 'mizige') {
-      const ITEMS_PER_PAGE = 10; // 10 từ / trang A4
-      const totalPages = Math.ceil(words.length / ITEMS_PER_PAGE) || 1;
+      const pageBatches = paginateItems(words, 15);
+      const totalPages = pageBatches.length;
 
-      for (let p = 0; p < totalPages; p++) {
-        const pageWords = words.slice(p * ITEMS_PER_PAGE, (p + 1) * ITEMS_PER_PAGE);
-
-        let rowsHTML = pageWords.map((word, wIdx) => {
+      pageBatches.forEach((batchWords, pageIdx) => {
+        let rowsHTML = batchWords.map((word) => {
           const chars = Array.from(word.hanzi);
+          const TOTAL_CELLS_PER_ROW = 14; // 14 ô trải kín 100% chiều ngang dòng kẻ A4
           
           return `
-            <div class="no-break-inside" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 8px; margin-bottom: 8px; background-color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; margin-bottom: 5px; background-color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
               <!-- Cột 1: Thông tin từ (Hán tự, Pinyin, Nghĩa) -->
-              <div style="width: 130px; flex-shrink: 0; line-height: 1.2;">
-                <div style="display: flex; align-items: baseline; gap: 6px;">
-                  <span style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 20px; font-weight: 900; color: #0f172a;">${word.hanzi}</span>
-                  <span style="font-family: monospace; font-size: 11px; font-weight: 700; color: #0284c7;">${word.pinyin}</span>
+              <div style="width: 105px; flex-shrink: 0; line-height: 1.2;">
+                <div style="display: flex; align-items: baseline; gap: 4px;">
+                  <span style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 18px; font-weight: 900; color: #0f172a;">${word.hanzi}</span>
+                  <span style="font-family: monospace; font-size: 10.5px; font-weight: 700; color: #0284c7;">${word.pinyin}</span>
                 </div>
-                <div style="font-size: 10px; color: #475569; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${word.meaning}">
+                <div style="font-size: 9.5px; color: #475569; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${word.meaning}">
                   ${word.meaning}
                 </div>
               </div>
 
-              <!-- Cột 2: Các ô Mễ Tự Cách (Mẫu + Đồ nét + Ô trống) -->
-              <div style="display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; overflow-x: hidden;">
+              <!-- Cột 2: Các ô Mễ Tự Cách TRẢI KÍN TOÀN BỘ CHIỀU NGANG -->
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 2.5px; flex: 1; min-width: 0;">
+                <!-- 1. Chữ mẫu in đậm -->
                 ${chars.map(c => buildGridCellHTML(cfg.gridStyle, cfg.gridColor, c, false, true)).join('')}
-                ${cfg.includeWatermark ? chars.map(c => buildGridCellHTML(cfg.gridStyle, cfg.gridColor, c, true, false)).join('') : ''}
                 
-                <!-- Các ô trống để tự viết -->
+                <!-- 2. Chữ mờ đồ nét (Nét nhạt để đặt bút tô lên) -->
+                ${cfg.includeWatermark ? (function() {
+                  if (chars.length === 1) {
+                    // Từ đơn: cho 2 ô mờ
+                    return buildGridCellHTML(cfg.gridStyle, cfg.gridColor, chars[0], true, false) +
+                           buildGridCellHTML(cfg.gridStyle, cfg.gridColor, chars[0], true, false);
+                  } else {
+                    return chars.map(c => buildGridCellHTML(cfg.gridStyle, cfg.gridColor, c, true, false)).join('');
+                  }
+                })() : ''}
+                
+                <!-- 3. Toàn bộ các ô trống trải kín cạnh phải hàng -->
                 ${(function() {
                   let emptyCells = '';
-                  const usedCount = chars.length * (cfg.includeWatermark ? 2 : 1);
-                  const remaining = Math.max(0, cfg.gridCount - usedCount);
+                  let usedCount = chars.length;
+                  if (cfg.includeWatermark) {
+                    usedCount += (chars.length === 1 ? 2 : chars.length);
+                  }
+                  const remaining = Math.max(0, TOTAL_CELLS_PER_ROW - usedCount);
                   for (let i = 0; i < remaining; i++) {
                     emptyCells += buildGridCellHTML(cfg.gridStyle, cfg.gridColor, '', false, false);
                   }
@@ -478,40 +491,38 @@
         }).join('');
 
         pagesHTML.push(`
-          <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+          <div class="worksheet-page" style="${pageBoxStyle}">
             <div>
-              ${buildPageHeaderHTML(lessonInfo, p + 1, totalPages, cfg)}
-              <div style="margin-top: 8px;">
+              ${buildPageHeaderHTML(lessonInfo, pageIdx + 1, totalPages, cfg)}
+              <div style="margin-top: 4px;">
                 ${rowsHTML}
               </div>
             </div>
             ${buildPageFooterHTML()}
           </div>
         `);
-      }
+      });
     }
 
     // =========================================================================
     // TEMPLATE 2: PHIẾU ĐIỀN PINYIN
     // =========================================================================
     else if (cfg.template === 'pinyin') {
-      const ITEMS_PER_PAGE = 12;
-      const totalPages = Math.ceil(words.length / ITEMS_PER_PAGE) || 1;
+      const pageBatches = paginateItems(words, 16);
+      const totalPages = pageBatches.length;
 
-      for (let p = 0; p < totalPages; p++) {
-        const pageWords = words.slice(p * ITEMS_PER_PAGE, (p + 1) * ITEMS_PER_PAGE);
-
+      pageBatches.forEach((batchWords, pageIdx) => {
         let rowsHTML = `
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            ${pageWords.map((word, idx) => `
-              <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            ${batchWords.map((word) => `
+              <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                  <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 26px; font-weight: 900; color: #0f172a;">${word.hanzi}</div>
-                  <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Nghĩa: ${word.meaning}</div>
+                  <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 24px; font-weight: 900; color: #0f172a;">${word.hanzi}</div>
+                  <div style="font-size: 9.5px; color: #64748b; margin-top: 1px;">Nghĩa: ${word.meaning}</div>
                 </div>
-                <div style="text-align: right; width: 140px;">
-                  <div style="font-size: 9px; color: #94a3b8; margin-bottom: 4px;">Tự viết Pinyin kèm thanh điệu:</div>
-                  <div style="border-bottom: 1.5px dashed #475569; height: 26px; width: 100%;"></div>
+                <div style="text-align: right; width: 130px;">
+                  <div style="font-size: 8.5px; color: #94a3b8; margin-bottom: 2px;">Viết Pinyin & thanh điệu:</div>
+                  <div style="border-bottom: 1.5px dashed #475569; height: 24px; width: 100%;"></div>
                 </div>
               </div>
             `).join('')}
@@ -519,11 +530,11 @@
         `;
 
         pagesHTML.push(`
-          <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+          <div class="worksheet-page" style="${pageBoxStyle}">
             <div>
-              ${buildPageHeaderHTML(lessonInfo, p + 1, totalPages, cfg)}
-              <div style="margin-top: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
+              ${buildPageHeaderHTML(lessonInfo, pageIdx + 1, totalPages, cfg)}
+              <div style="margin-top: 6px;">
+                <div style="font-size: 10px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 5px 10px; border-radius: 4px; margin-bottom: 8px;">
                   📝 HƯỚNG DẪN: Đọc chữ Hán và tự tay viết phiên âm Pinyin kèm dấu thanh điệu chuẩn xác vào dòng kẻ đứt.
                 </div>
                 ${rowsHTML}
@@ -532,30 +543,28 @@
             ${buildPageFooterHTML()}
           </div>
         `);
-      }
+      });
     }
 
     // =========================================================================
     // TEMPLATE 3: PHIẾU DỊCH NGHĨA TIẾNG VIỆT
     // =========================================================================
     else if (cfg.template === 'meaning') {
-      const ITEMS_PER_PAGE = 12;
-      const totalPages = Math.ceil(words.length / ITEMS_PER_PAGE) || 1;
+      const pageBatches = paginateItems(words, 16);
+      const totalPages = pageBatches.length;
 
-      for (let p = 0; p < totalPages; p++) {
-        const pageWords = words.slice(p * ITEMS_PER_PAGE, (p + 1) * ITEMS_PER_PAGE);
-
+      pageBatches.forEach((batchWords, pageIdx) => {
         let rowsHTML = `
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            ${pageWords.map((word, idx) => `
-              <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            ${batchWords.map((word) => `
+              <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                  <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 24px; font-weight: 900; color: #0f172a;">${word.hanzi}</div>
-                  <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0284c7; margin-top: 2px;">${word.pinyin}</div>
+                  <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 22px; font-weight: 900; color: #0f172a;">${word.hanzi}</div>
+                  <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: #0284c7;">${word.pinyin}</div>
                 </div>
-                <div style="text-align: right; width: 140px;">
-                  <div style="font-size: 9px; color: #94a3b8; margin-bottom: 4px;">Dịch nghĩa tiếng Việt:</div>
-                  <div style="border-bottom: 1.5px dashed #475569; height: 26px; width: 100%;"></div>
+                <div style="text-align: right; width: 130px;">
+                  <div style="font-size: 8.5px; color: #94a3b8; margin-bottom: 2px;">Dịch nghĩa tiếng Việt:</div>
+                  <div style="border-bottom: 1.5px dashed #475569; height: 24px; width: 100%;"></div>
                 </div>
               </div>
             `).join('')}
@@ -563,11 +572,11 @@
         `;
 
         pagesHTML.push(`
-          <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+          <div class="worksheet-page" style="${pageBoxStyle}">
             <div>
-              ${buildPageHeaderHTML(lessonInfo, p + 1, totalPages, cfg)}
-              <div style="margin-top: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
+              ${buildPageHeaderHTML(lessonInfo, pageIdx + 1, totalPages, cfg)}
+              <div style="margin-top: 6px;">
+                <div style="font-size: 10px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 5px 10px; border-radius: 4px; margin-bottom: 8px;">
                   📝 HƯỚNG DẪN: Nhìn Chữ Hán và Pinyin, tự tay dịch nghĩa tiếng Việt tương ứng vào dòng kẻ đứt.
                 </div>
                 ${rowsHTML}
@@ -576,29 +585,27 @@
             ${buildPageFooterHTML()}
           </div>
         `);
-      }
+      });
     }
 
     // =========================================================================
     // TEMPLATE 4: PHIẾU NHỚ MẶT CHỮ (VIẾT CHỮ HÁN TỪ TRÍ NHỚ)
     // =========================================================================
     else if (cfg.template === 'hanzi_recall') {
-      const ITEMS_PER_PAGE = 10;
-      const totalPages = Math.ceil(words.length / ITEMS_PER_PAGE) || 1;
+      const pageBatches = paginateItems(words, 15);
+      const totalPages = pageBatches.length;
 
-      for (let p = 0; p < totalPages; p++) {
-        const pageWords = words.slice(p * ITEMS_PER_PAGE, (p + 1) * ITEMS_PER_PAGE);
-
-        let rowsHTML = pageWords.map((word, wIdx) => {
+      pageBatches.forEach((batchWords, pageIdx) => {
+        let rowsHTML = batchWords.map((word) => {
           const chars = Array.from(word.hanzi);
           return `
-            <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
-              <div style="width: 180px; flex-shrink: 0;">
-                <div style="font-size: 13px; font-weight: 800; color: #0f172a;">${word.meaning}</div>
-                <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0284c7; margin-top: 2px;">Pinyin: ${word.pinyin}</div>
+            <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; margin-bottom: 6px; background: #ffffff; display: flex; align-items: center; justify-content: space-between;">
+              <div style="width: 220px; flex-shrink: 0;">
+                <div style="font-size: 12px; font-weight: 800; color: #0f172a;">${word.meaning}</div>
+                <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: #0284c7; margin-top: 1px;">Pinyin: ${word.pinyin}</div>
               </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 10px; color: #94a3b8; margin-right: 6px;">Viết Chữ Hán:</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 9px; color: #94a3b8; margin-right: 6px;">Viết Chữ Hán:</span>
                 ${chars.map(() => buildGridCellHTML(cfg.gridStyle, cfg.gridColor, '', false, false)).join('')}
               </div>
             </div>
@@ -606,11 +613,11 @@
         }).join('');
 
         pagesHTML.push(`
-          <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+          <div class="worksheet-page" style="${pageBoxStyle}">
             <div>
-              ${buildPageHeaderHTML(lessonInfo, p + 1, totalPages, cfg)}
-              <div style="margin-top: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: #7e22ce; background: #f3e8ff; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
+              ${buildPageHeaderHTML(lessonInfo, pageIdx + 1, totalPages, cfg)}
+              <div style="margin-top: 6px;">
+                <div style="font-size: 10px; font-weight: 700; color: #7e22ce; background: #f3e8ff; padding: 5px 10px; border-radius: 4px; margin-bottom: 8px;">
                   📝 HƯỚNG DẪN THỬ THÁCH: Đọc nghĩa tiếng Việt và Pinyin, tự nhớ và viết Chữ Hán chuẩn xác vào ô trống mà không nhìn tài liệu!
                 </div>
                 ${rowsHTML}
@@ -619,7 +626,7 @@
             ${buildPageFooterHTML()}
           </div>
         `);
-      }
+      });
     }
 
     // =========================================================================
@@ -642,43 +649,43 @@
         });
       }
 
-      const ITEMS_PER_PAGE = 6; // 6 câu thoại / trang
+      const ITEMS_PER_PAGE = 7;
       const totalPages = Math.ceil(allLines.length / ITEMS_PER_PAGE) || 1;
 
       for (let p = 0; p < totalPages; p++) {
         const pageLines = allLines.slice(p * ITEMS_PER_PAGE, (p + 1) * ITEMS_PER_PAGE);
 
-        let rowsHTML = pageLines.map((line, lIdx) => `
-          <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; background: #ffffff;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">
-              <span style="font-size: 10px; font-weight: 800; color: #d97706; text-transform: uppercase;">${line.dlgTitle} • ${line.role}</span>
-              <span style="font-size: 11px; color: #475569; italic">"${line.vi}"</span>
+        let rowsHTML = pageLines.map((line) => `
+          <div class="no-break-inside" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; background: #ffffff;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 3px; margin-bottom: 6px;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #d97706; text-transform: uppercase;">${line.dlgTitle} • ${line.role}</span>
+              <span style="font-size: 10.5px; color: #475569; italic">"${line.vi}"</span>
             </div>
             
             <!-- Câu mẫu -->
-            <div style="margin-bottom: 8px;">
-              <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: 0.05em;">
+            <div style="margin-bottom: 6px;">
+              <div style="font-family: 'LXGW WenKai Screen R', 'KaiTi', '楷体', serif; font-size: 19px; font-weight: 900; color: #0f172a; letter-spacing: 0.04em;">
                 ${line.hanzi}
               </div>
-              <div style="font-family: monospace; font-size: 12px; font-weight: 700; color: #0284c7; margin-top: 2px;">
+              <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: #0284c7; margin-top: 1px;">
                 ${line.pinyin}
               </div>
             </div>
 
             <!-- Dòng chép tay -->
-            <div style="border-top: 1px dashed #cbd5e1; padding-top: 6px;">
-              <div style="font-size: 9px; color: #94a3b8; margin-bottom: 4px;">Dòng luyện chép lại câu:</div>
-              <div style="border-bottom: 1.5px dashed #94a3b8; height: 28px; width: 100%;"></div>
+            <div style="border-top: 1px dashed #cbd5e1; padding-top: 4px;">
+              <div style="font-size: 8.5px; color: #94a3b8; margin-bottom: 2px;">Dòng luyện chép lại câu:</div>
+              <div style="border-bottom: 1.5px dashed #94a3b8; height: 26px; width: 100%;"></div>
             </div>
           </div>
         `).join('');
 
         pagesHTML.push(`
-          <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+          <div class="worksheet-page" style="${pageBoxStyle}">
             <div>
               ${buildPageHeaderHTML(lessonInfo, p + 1, totalPages, cfg)}
-              <div style="margin-top: 10px;">
-                <div style="font-size: 11px; font-weight: 700; color: #b45309; background: #fef3c7; padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
+              <div style="margin-top: 6px;">
+                <div style="font-size: 10px; font-weight: 700; color: #b45309; background: #fef3c7; padding: 5px 10px; border-radius: 4px; margin-bottom: 8px;">
                   📝 HƯỚNG DẪN: Luyện viết câu đàm thoại nguyên vẹn để xây dựng phản xạ ngữ pháp và nối từ thành câu hoàn chỉnh.
                 </div>
                 ${rowsHTML}
@@ -691,20 +698,20 @@
     }
 
     // =========================================================================
-    // TRANG ĐÁP ÁN (ANSWER KEY) Ở CUỐI NẾU ĐƯỢC CHỌN
+    // TRANG ĐÁP ÁN (ANSWER KEY)
     // =========================================================================
     if (cfg.includeAnswerKey) {
       const ansHTML = `
-        <div class="worksheet-page" style="width: 210mm; min-height: 297mm; background: #ffffff; padding: 12mm 10mm; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; display: flex; flex-col; justify-content: space-between;">
+        <div class="worksheet-page" style="${pageBoxStyle}">
           <div>
             ${buildPageHeaderHTML(lessonInfo, pagesHTML.length + 1, pagesHTML.length + 1, cfg)}
-            <div style="margin-top: 10px;">
-              <div style="font-size: 13px; font-weight: 900; color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 4px; margin-bottom: 12px;">
+            <div style="margin-top: 8px;">
+              <div style="font-size: 12px; font-weight: 900; color: #0f172a; border-bottom: 2px solid #0f172a; padding-bottom: 3px; margin-bottom: 10px;">
                 🔑 BẢNG ĐÁP ÁN TRA CỨU & TỰ CHẤM ĐIỂM (ANSWER KEY)
               </div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
                 ${words.map((w, i) => `
-                  <div style="font-size: 11px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; display: flex; justify-content: space-between;">
+                  <div style="font-size: 10px; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 8px; display: flex; justify-content: space-between;">
                     <span><b>${i + 1}. ${w.hanzi}</b> <span style="color: #0284c7; font-family: monospace;">[${w.pinyin}]</span></span>
                     <span style="color: #475569;">${w.meaning}</span>
                   </div>
@@ -720,14 +727,14 @@
 
     if (badge) {
       badge.textContent = `${pagesHTML.length} Trang A4`;
+      badge.className = pagesHTML.length === 1 
+        ? "px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-mono font-bold"
+        : "px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 font-mono font-bold";
     }
 
     previewContainer.innerHTML = pagesHTML.join('');
   }
 
-  /**
-   * Kích hoạt in tài liệu (In trực tiếp máy in hoặc Lưu dạng PDF)
-   */
   function executePrintWorksheet() {
     let printContainer = document.getElementById('printable-worksheet');
     if (!printContainer) {
@@ -736,19 +743,16 @@
       document.body.appendChild(printContainer);
     }
 
-    // Lấy nội dung từ Preview container
     const previewContainer = document.getElementById('worksheet-preview-container');
     if (!previewContainer) return;
 
     printContainer.innerHTML = previewContainer.innerHTML;
 
-    // Kích hoạt In trình duyệt
     setTimeout(() => {
       window.print();
     }, 150);
   }
 
-  // Export các hàm toàn cục
   window.openPrintModal = openPrintModal;
   window.closePrintModal = closePrintModal;
   window.updateWorksheetOption = updateWorksheetOption;
