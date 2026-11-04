@@ -242,7 +242,18 @@
       return;
     }
 
-    state.currentItem = item;
+    const isVdc = (typeof window.isVdcActive !== 'undefined') ? window.isVdcActive : true;
+    const activeEx = (typeof window.getActiveExampleForWord === 'function')
+      ? window.getActiveExampleForWord(item, window.currentLessonId || item.lesson_id, isVdc)
+      : { hz: item.ex_hz, py: item.ex_py, vi: item.ex_vi, isVdc: true };
+
+    state.currentItem = {
+      ...item,
+      ex_hz: activeEx.hz,
+      ex_py: activeEx.py,
+      ex_vi: activeEx.vi,
+      isVdc: isVdc
+    };
     state.activeTab = 'typing';
     state.typingPromptMode = 'vi';
     state.typingChecked = false;

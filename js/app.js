@@ -10,6 +10,16 @@ let favoriteWords = new Set();
 let isPlayingAll = false;
 let playAllIndex = 0;
 let playAllTimeout = null;
+let isVdcActive = true;
+try {
+  const savedVdc = localStorage.getItem('hihsk_vdc_active');
+  if (savedVdc !== null) {
+    isVdcActive = (savedVdc !== 'false');
+  }
+} catch (e) {
+  console.warn("LocalStorage error:", e);
+}
+window.isVdcActive = isVdcActive;
 
 // Khởi tạo ứng dụng
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initVoiceVoices();
   window.ChineseFontManager.init();
+  updateVdcButtonUI();
   if (typeof initDialogueModule === 'function') {
     initDialogueModule();
   }
@@ -51,11 +62,53 @@ function loadSavedState() {
 /**
  * Lưu trạng thái vào LocalStorage
  */
+/**
+ * Cập nhật giao diện Nút VDC (Bật / Tắt)
+ */
+function updateVdcButtonUI() {
+  const btn = document.getElementById('btn-toggle-vdc');
+  const icon = document.getElementById('vdc-icon');
+  const text = document.getElementById('vdc-text');
+  if (!btn || !icon || !text) return;
+
+  if (window.isVdcActive) {
+    btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5';
+    btn.title = 'Ví Dụ Chuẩn (VDC) đang BẬT: Dùng câu ví dụ chuẩn SGK. Bấm để TẮT và đổi sang câu ví dụ tích luỹ (chỉ dùng từ vựng đã học).';
+    icon.textContent = '✨';
+    text.textContent = 'VDC: BẬT';
+  } else {
+    btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 shadow-sm transition-all flex items-center gap-1.5';
+    btn.title = `Chế độ Ví Dụ Tích Luỹ đang BẬT (VDC Tắt): Câu ví dụ chỉ dùng từ vựng Bài 1 đến Bài ${currentLessonId}. Chữ bài sau chưa học được tô màu vàng.`;
+    icon.textContent = '🎯';
+    text.textContent = 'VDC: TẮT (Tích luỹ)';
+  }
+}
+window.updateVdcButtonUI = updateVdcButtonUI;
+
+/**
+ * Bật / Tắt chế độ VDC
+ */
+function toggleVdcMode() {
+  window.isVdcActive = !window.isVdcActive;
+  try {
+    localStorage.setItem('hihsk_vdc_active', window.isVdcActive.toString());
+  } catch (e) {}
+  updateVdcButtonUI();
+  renderVocabList();
+  if (window.isVdcActive) {
+    showToast("✨ Đã BẬT VDC: Sử dụng câu ví dụ chuẩn giáo trình.");
+  } else {
+    showToast(`🎯 Đã TẮT VDC: Đổi sang câu ví dụ tích luỹ (Bài 1 - ${currentLessonId}). Chữ chưa học tô màu vàng!`);
+  }
+}
+window.toggleVdcMode = toggleVdcMode;
+
 function saveState() {
   try {
     localStorage.setItem('hihsk_learned_words', JSON.stringify(Array.from(learnedWords)));
     localStorage.setItem('hihsk_favorite_words', JSON.stringify(Array.from(favoriteWords)));
     localStorage.setItem('hihsk_current_lesson', currentLessonId.toString());
+    localStorage.setItem('hihsk_vdc_active', window.isVdcActive.toString());
   } catch (e) {
     console.warn("LocalStorage save error:", e);
   }
@@ -153,6 +206,7 @@ function switchLesson(lessonNo) {
     renderVocabList(words, searchScope === 'all');
   }
   updateSidebarProgress();
+  updateVdcButtonUI();
 
   showToast(`📖 Đã chuyển sang Bài ${currentLessonId}: ${lessonInfo.title_vi || lessonInfo.title}`);
 }
@@ -377,9 +431,20 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
       isLearned ? 'border-emerald-500/40' : ''
     }`;
 
-    // Render Ruby HTML cho câu ví dụ (Đồng bộ tương tác 2 chiều & Tra từ điển khi rê chuột / chạm cảm ứng)
+    // Xác định câu ví dụ đang áp dụng (VDC Bật: ví dụ chuẩn SGK; VDC Tắt: ví dụ tích luỹ chỉ dùng từ bài 1 -> bài hiện tại)
+    const activeEx = (typeof window.getActiveExampleForWord === 'function')
+      ? window.getActiveExampleForWord(item, currentLessonId, window.isVdcActive)
+      : { hz: item.ex_hz, py: item.ex_py, vi: item.ex_vi, isVdc: true };
+
+    const exHz = activeEx.hz || item.ex_hz || '';
+    const exPy = activeEx.py || item.ex_py || '';
+    const exVi = activeEx.vi || item.ex_vi || '';
+
+    // Render Ruby HTML cho câu ví dụ
     let rubyHtml = '';
-    if (item.ex_tokens && item.ex_tokens.length > 0) {
+    let hasUnlearnedChars = false;
+
+    if (window.isVdcActive && item.ex_tokens && item.ex_tokens.length > 0) {
       rubyHtml = item.ex_tokens.map((token, tIdx) => {
         if (!token.py || /^[，。！？、“”‘’：；\s,\.!\?:;\-]+$/.test(token.hz)) {
           return `<span class="chinese-font text-lg text-slate-400 select-none">${token.hz}</span>`;
@@ -407,9 +472,9 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
           </ruby>
         `;
       }).join(' ');
-    } else if (item.ex_hz) {
-      if (typeof window.HanziLookup !== 'undefined' && typeof window.HanziLookup.alignSentence === 'function' && item.ex_py) {
-        const pairs = window.HanziLookup.alignSentence(item.ex_hz, item.ex_py);
+    } else if (exHz) {
+      if (typeof window.HanziLookup !== 'undefined' && typeof window.HanziLookup.alignSentence === 'function' && exPy) {
+        const pairs = window.HanziLookup.alignSentence(exHz, exPy);
         rubyHtml = pairs.map((p, pIdx) => {
           if (p.isPunct) {
             return `<span class="chinese-font text-lg text-slate-400 select-none">${p.hz}</span>`;
@@ -419,15 +484,39 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
           const escapedVi = (info.vi || '').replace(/"/g, '&quot;');
           const escapedPy = (info.py || p.py || '').replace(/"/g, '&quot;');
           const escapedType = (info.type || '').replace(/"/g, '&quot;');
+
+          const isKeyword = (p.hz === item.hanzi || item.hanzi.includes(p.hz));
+
+          // Khi VDC TẮT: Kiểm tra từng chữ xem đã học chưa (thuộc bài <= currentLessonId)
+          let hzSpanContent = '';
+          if (!window.isVdcActive) {
+            hzSpanContent = p.hz.split('').map(ch => {
+              const isLearned = (typeof window.isCharLearnedInLesson === 'function')
+                ? window.isCharLearnedInLesson(ch, currentLessonId)
+                : true;
+
+              if (isKeyword) {
+                return `<span class="text-rose-400 font-bold">${ch}</span>`;
+              } else if (!isLearned) {
+                hasUnlearnedChars = true;
+                return `<span class="text-amber-300 font-black underline decoration-amber-400/60 decoration-dashed underline-offset-4" title="Chữ '${ch}' thuộc bài sau (chưa học)">${ch}</span>`;
+              } else {
+                return `<span class="text-slate-100">${ch}</span>`;
+              }
+            }).join('');
+          } else {
+            hzSpanContent = p.hz;
+          }
+
           return `
-            <ruby class="sync-word" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để dịch từ này">
-              <span class="chinese-font text-xl sync-word-hz" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${p.hz}</span>
+            <ruby class="sync-word ${isKeyword ? 'highlight-word' : ''}" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để dịch từ này">
+              <span class="chinese-font text-xl sync-word-hz" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${hzSpanContent}</span>
               <rt class="sync-word-py" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${p.py}</rt>
             </ruby>
           `;
         }).join(' ');
       } else {
-        rubyHtml = `<span class="chinese-font text-xl text-white hz-interactive" data-hz="${item.ex_hz}">${item.ex_hz}</span>`;
+        rubyHtml = `<span class="chinese-font text-xl text-white hz-interactive" data-hz="${exHz}">${exHz}</span>`;
       }
     }
 
@@ -541,7 +630,7 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
         <!-- Cột trái: Nút Loa & Nút Mic luyện phát âm câu ví dụ -->
         <div class="flex flex-col gap-1.5 flex-shrink-0 mt-0.5">
           <!-- Nút loa phát âm cả câu ví dụ -->
-          <button onclick="speakChinese('${item.ex_hz}')" title="Nghe câu ví dụ" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/80 text-cyan-400 hover:bg-cyan-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+          <button onclick="speakChinese('${exHz.replace(/'/g, "\\'")}')" title="Nghe câu ví dụ" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/80 text-cyan-400 hover:bg-cyan-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
           </button>
           <!-- Nút mic luyện nói câu ví dụ & chấm điểm AI -->
@@ -551,6 +640,24 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
         </div>
 
         <div class="flex-1 min-w-0">
+          ${!window.isVdcActive ? `
+            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                🎯 Ví dụ tích luỹ (Bài 1 - ${currentLessonId})
+              </span>
+              ${hasUnlearnedChars ? `
+                <span class="text-[10px] text-amber-300 font-medium flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse"></span>
+                  <span>Chữ màu vàng: từ bài sau</span>
+                </span>
+              ` : `
+                <span class="text-[10px] text-emerald-400 font-medium">
+                  ✓ 100% từ vựng đã học
+                </span>
+              `}
+            </div>
+          ` : ''}
+
           <!-- Câu Hán tự kèm Pinyin trên từng chữ (Ảnh 1) -->
           <div class="flex flex-wrap items-end gap-y-2 mb-2">
             ${rubyHtml}
@@ -558,7 +665,7 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
 
           <!-- Nghĩa tiếng Việt màu đỏ cam nổi bật -->
           <p class="text-sm font-semibold text-rose-400">
-            ${item.ex_vi}
+            ${exVi}
           </p>
         </div>
 
@@ -594,6 +701,7 @@ function toggleLearned(wordId) {
   saveState();
   renderVocabList();
   updateSidebarProgress();
+  updateVdcButtonUI();
 }
 
 /**

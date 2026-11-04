@@ -360,7 +360,13 @@
           <!-- Các nút hành động chính -->
           <div class="flex items-center gap-2.5 flex-wrap">
             <!-- Nút Phát tất cả -->
-            <button id="btn-play-all" onclick="togglePlayAll()" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all flex items-center gap-2">
+            <!-- Nút VDC (Ví Dụ Chuẩn / Ví Dụ Tích Luỹ) -->
+            <button id="btn-toggle-vdc" onclick="toggleVdcMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5" title="Ví Dụ Chuẩn (VDC) đang BẬT: Dùng câu ví dụ chuẩn SGK. Bấm để TẮT và đổi sang câu ví dụ tích luỹ (chỉ dùng từ vựng đã học).">
+              <span id="vdc-icon">✨</span>
+              <span id="vdc-text">VDC: BẬT</span>
+            </button>
+
+            <button id="btn-play-all"  onclick="togglePlayAll()" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all flex items-center gap-2">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <span>Phát tất cả</span>
             </button>
@@ -1309,6 +1315,7 @@
   <script src="data/tone-sandhi.js?v=1.1"></script>
   <script src="data/guide-generator.js?v=2.1"></script>
   <script src="data/vocab-data.js?v=3.5"></script>
+  <script src="data/cumulative-examples.js?v=1.0"></script>
   <script src="data/dialogue-data.js?v=3.2"></script>
   <script src="data/radicals-data.js"></script>
   <script src="data/hanzi-hover-dict.js?v=2.0"></script>

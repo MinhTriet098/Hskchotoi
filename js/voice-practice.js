@@ -643,14 +643,20 @@ function prevVoiceWord() {
 function openVoiceModalForExample(wordId) {
   const item = (window.VOCAB_DATABASE || []).find(w => w.id === wordId);
   if (!item) return;
+
+  const isVdc = (typeof window.isVdcActive !== 'undefined') ? window.isVdcActive : true;
+  const activeEx = (typeof window.getActiveExampleForWord === 'function')
+    ? window.getActiveExampleForWord(item, window.currentLessonId || item.lesson_id, isVdc)
+    : { hz: item.ex_hz, py: item.ex_py, vi: item.ex_vi, isVdc: true };
+
   openVoiceModal({
     id: `ex_${item.id}`,
     vocab_id: item.id,
-    hanzi: item.ex_hz,
-    pinyin: item.ex_py || '',
-    meaning: item.ex_vi || '',
-    type: "CÂU VÍ DỤ",
-    type_detail: `Ví dụ của từ: ${item.hanzi} (${item.pinyin})`,
+    hanzi: activeEx.hz,
+    pinyin: activeEx.py || '',
+    meaning: activeEx.vi || '',
+    type: isVdc ? "CÂU VÍ DỤ CHUẨN" : "CÂU VÍ DỤ TÍCH LUỸ",
+    type_detail: isVdc ? `Ví dụ chuẩn: ${item.hanzi} (${item.pinyin})` : `Ví dụ tích luỹ (Bài 1-${window.currentLessonId || item.lesson_id}): ${item.hanzi}`,
     isExampleSentence: true
   });
 }
