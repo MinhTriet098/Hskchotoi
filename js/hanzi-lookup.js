@@ -118,6 +118,27 @@ window.HanziLookup = {
   /**
    * Tra cứu thông tin từ điển thông minh (Dict -> HSK_VOCAB -> Ký tự đơn)
    */
+  /**
+   * Tìm từ vựng trong cơ sở dữ liệu VOCAB_DATABASE
+   */
+  findVocabItem(hz) {
+    if (!hz || !window.VOCAB_DATABASE || !Array.isArray(window.VOCAB_DATABASE)) return null;
+    const cleanHz = hz.trim();
+    if (!cleanHz) return null;
+
+    // 1. Khớp chính xác
+    let found = window.VOCAB_DATABASE.find(w => w.hanzi === cleanHz);
+    if (found) return found;
+
+    // 2. Từ ghép chứa chữ này (ưu tiên từ ghép ngắn nhất)
+    const matches = window.VOCAB_DATABASE.filter(w => w.hanzi.includes(cleanHz) || cleanHz.includes(w.hanzi));
+    if (matches.length > 0) {
+      matches.sort((a, b) => a.hanzi.length - b.hanzi.length);
+      return matches[0];
+    }
+    return null;
+  },
+
   getDictInfo(hz, py) {
     const dict = window.HANZI_HOVER_DICT || {};
     if (dict[hz]) return dict[hz];
@@ -462,7 +483,15 @@ window.HanziLookup = {
 
     if (hzEl) hzEl.textContent = hz;
     if (pyEl) pyEl.textContent = py;
-    if (viEl) viEl.textContent = vi || 'Từ vựng HSK 1';
+
+    // Tìm bài học tương ứng trong VOCAB_DATABASE để hiển thị "Bài ..."
+    const foundVocab = this.findVocabItem(hz);
+    let meaningHtml = vi || 'Từ vựng HSK 1';
+    if (foundVocab) {
+      meaningHtml = `${meaningHtml} - <button type="button" onclick="window.jumpToVocabCard(${foundVocab.lesson_id}, ${foundVocab.id})" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-500/25 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-400/50 text-xs font-black cursor-pointer transition-all shadow-sm align-middle transform active:scale-95" title="Bấm để nhảy đến Bài ${foundVocab.lesson_id} và xem từ vựng này"><span>Bài ${foundVocab.lesson_id}</span><span class="text-[10px]">➔</span></button>`;
+    }
+    if (viEl) viEl.innerHTML = meaningHtml;
+
     if (typeEl) {
       if (type) {
         typeEl.textContent = type;
@@ -616,3 +645,40 @@ if (document.readyState === 'loading') {
 } else {
   window.HanziLookup.init();
 }
+
+/**
+ * Nhảy trực tiếp đến bài học và cuộn xuống đúng thẻ từ vựng
+ */
+window.jumpToVocabCard = function(lessonId, vocabId) {
+  // 1. Đóng tooltip tra từ
+  if (window.HanziLookup && typeof window.HanziLookup.hideTooltip === 'function') {
+    window.HanziLookup.hideTooltip();
+  }
+
+  // 2. Chuyển sang chế độ xem Từ vựng (nếu đang ở Bài khoá hoặc Sách bài tập)
+  if (typeof switchMainView === 'function') {
+    switchMainView('vocab');
+  }
+
+  // 3. Nếu chưa ở bài học đó, chuyển sang bài học đó
+  if (typeof switchLesson === 'function' && window.currentLessonId !== lessonId) {
+    switchLesson(lessonId);
+  }
+
+  // 4. Tìm thẻ từ vựng và cuộn mượt tới vị trí chính giữa màn hình
+  setTimeout(() => {
+    const card = document.getElementById(`vocab-card-${vocabId}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Hiệu ứng nhấp nháy sáng viền vàng rực rỡ để người học thấy ngay
+      card.classList.add('ring-4', 'ring-amber-400', 'border-amber-400', 'shadow-2xl', 'shadow-amber-500/40', 'scale-[1.02]');
+      setTimeout(() => {
+        card.classList.remove('scale-[1.02]');
+      }, 300);
+      setTimeout(() => {
+        card.classList.remove('ring-4', 'ring-amber-400', 'border-amber-400', 'shadow-2xl', 'shadow-amber-500/40');
+      }, 2500);
+    }
+  }, 150);
+};
