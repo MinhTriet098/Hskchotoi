@@ -98,6 +98,12 @@
 
       <!-- Top Right: Global Utilities & Mode -->
       <div class="flex items-center gap-2">
+        <!-- Nút Bật/Tắt Bộ Gõ Tiếng Trung Ảo (Pinyin IME) -->
+        <button onclick="if(window.ChineseIME) window.ChineseIME.togglePower()" id="nav-ime-toggle-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/70 text-emerald-300 hover:text-white text-xs font-bold transition-all shadow-sm ring-1 ring-emerald-500/30" title="Bật/Tắt Bộ gõ Tiếng Trung Pinyin (Google Input Tools) - Phím tắt Shift để đổi Trung/Anh">
+          <span class="text-sm font-black text-amber-300">拼</span>
+          <span id="nav-ime-status-text">Gõ Trung [中]</span>
+        </button>
+
         <!-- Nút Đổi Phông Chữ Hán (Khải Thư / Mặc định) -->
         <button onclick="toggleChineseFont()" class="btn-font-toggle flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/60 text-amber-300 hover:text-white text-xs font-bold transition-all shadow-sm" title="Chuyển đổi phông chữ: Khải Thư 楷体 (nét bút SGK) hoặc Mặc định 黑体 (nét in)">
           <span>🖌️</span>
@@ -1320,6 +1326,8 @@
   <script src="js/translator.js?v=2.0"></script>
   <script src="js/worksheet-generator.js?v=2.2"></script>
   <script src="js/ai-conversation.js?v=2.1"></script>
+  <script src="data/chinese-ime-dict.js?v=1.0"></script>
+  <script src="js/chinese-ime.js?v=1.0"></script>
   <script src="js/app.js?v=3.9"></script>
 
   <script>

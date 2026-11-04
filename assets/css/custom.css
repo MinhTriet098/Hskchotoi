@@ -506,3 +506,42 @@ img {
   color: inherit;
   opacity: 0.85;
 }
+
+
+/* ==============================================================
+   GOOGLE INPUT TOOLS PINYIN IME (BÀN PHÍM GÕ TIẾNG TRUNG ẢO)
+   ============================================================== */
+#chinese-ime-toolbar {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#chinese-ime-toolbar button {
+  outline: none;
+}
+
+#chinese-ime-candidate-box {
+  animation: imeFadeIn 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@keyframes imeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ime-candidate-item {
+  cursor: pointer;
+}
+
+.ime-candidate-item:hover {
+  border-color: rgba(6, 182, 212, 0.7) !important;
+  background-color: rgba(8, 51, 68, 0.9) !important;
+}
