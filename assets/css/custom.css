@@ -545,3 +545,26 @@ img {
   border-color: rgba(6, 182, 212, 0.7) !important;
   background-color: rgba(8, 51, 68, 0.9) !important;
 }
+
+ruby.sync-word {
+  display: inline-flex !important;
+  flex-direction: column-reverse !important;
+  vertical-align: bottom !important;
+  align-items: center !important;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 1px 2px;
+  margin: 0 1.5px;
+}
+
+ruby.sync-word rt {
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: all 0.16s ease;
+}
+
+ruby.sync-word span {
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: all 0.16s ease;
+}

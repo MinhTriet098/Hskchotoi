@@ -377,23 +377,58 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
       isLearned ? 'border-emerald-500/40' : ''
     }`;
 
-    // Render Ruby HTML cho câu ví dụ
+    // Render Ruby HTML cho câu ví dụ (Đồng bộ tương tác 2 chiều & Tra từ điển khi rê chuột / chạm cảm ứng)
     let rubyHtml = '';
     if (item.ex_tokens && item.ex_tokens.length > 0) {
-      rubyHtml = item.ex_tokens.map(token => {
-        if (!token.py) {
-          return `<span class="chinese-font text-lg text-slate-300">${token.hz}</span>`;
+      rubyHtml = item.ex_tokens.map((token, tIdx) => {
+        if (!token.py || /^[，。！？、“”‘’：；\s,\.!\?:;\-]+$/.test(token.hz)) {
+          return `<span class="chinese-font text-lg text-slate-400 select-none">${token.hz}</span>`;
         }
         const isHighlight = token.highlight;
+        const syncId = `vocab-ex-${item.id}-${tIdx}`;
+
+        // Lấy thông tin từ điển để hiển thị nghĩa & loại từ trong Tooltip
+        let info = null;
+        if (typeof window.HanziLookup !== 'undefined' && typeof window.HanziLookup.getDictInfo === 'function') {
+          info = window.HanziLookup.getDictInfo(token.hz, token.py);
+        }
+        const vi = (info && info.vi) ? info.vi : '';
+        const py = (info && info.py) ? info.py : token.py;
+        const type = (info && info.type) ? info.type : '';
+
+        const escapedVi = vi.replace(/"/g, '&quot;');
+        const escapedPy = py.replace(/"/g, '&quot;');
+        const escapedType = type.replace(/"/g, '&quot;');
+
         return `
-          <ruby class="${isHighlight ? 'highlight-word' : ''}">
-            <span class="chinese-font text-xl">${token.hz}</span>
-            <rt>${token.py}</rt>
+          <ruby class="sync-word ${isHighlight ? 'highlight-word' : ''}" data-sync-id="${syncId}" data-hz="${token.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để dịch từ này">
+            <span class="chinese-font text-xl sync-word-hz" data-sync-id="${syncId}" data-hz="${token.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${token.hz}</span>
+            <rt class="sync-word-py" data-sync-id="${syncId}" data-hz="${token.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${token.py}</rt>
           </ruby>
         `;
       }).join(' ');
-    } else {
-      rubyHtml = `<span class="chinese-font text-xl text-white">${item.ex_hz}</span>`;
+    } else if (item.ex_hz) {
+      if (typeof window.HanziLookup !== 'undefined' && typeof window.HanziLookup.alignSentence === 'function' && item.ex_py) {
+        const pairs = window.HanziLookup.alignSentence(item.ex_hz, item.ex_py);
+        rubyHtml = pairs.map((p, pIdx) => {
+          if (p.isPunct) {
+            return `<span class="chinese-font text-lg text-slate-400 select-none">${p.hz}</span>`;
+          }
+          const syncId = `vocab-ex-${item.id}-${pIdx}`;
+          const info = window.HanziLookup.getDictInfo(p.hz, p.py);
+          const escapedVi = (info.vi || '').replace(/"/g, '&quot;');
+          const escapedPy = (info.py || p.py || '').replace(/"/g, '&quot;');
+          const escapedType = (info.type || '').replace(/"/g, '&quot;');
+          return `
+            <ruby class="sync-word" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}" title="Bấm hoặc rê chuột để dịch từ này">
+              <span class="chinese-font text-xl sync-word-hz" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${p.hz}</span>
+              <rt class="sync-word-py" data-sync-id="${syncId}" data-hz="${p.hz}" data-py="${escapedPy}" data-vi="${escapedVi}" data-type="${escapedType}">${p.py}</rt>
+            </ruby>
+          `;
+        }).join(' ');
+      } else {
+        rubyHtml = `<span class="chinese-font text-xl text-white hz-interactive" data-hz="${item.ex_hz}">${item.ex_hz}</span>`;
+      }
     }
 
     card.innerHTML = `
