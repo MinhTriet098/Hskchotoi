@@ -127,20 +127,35 @@ window.getCurrentLessonWords = getCurrentLessonWords;
  */
 function initLessonDropdown() {
   const select = document.getElementById('lesson-select');
-  if (!select) return;
-  select.innerHTML = '';
+  const headerSelect = document.getElementById('header-lesson-select');
 
-  window.HSK_LESSONS.forEach(l => {
-    const opt = document.createElement('option');
-    opt.value = l.lesson_no;
-    opt.textContent = `Bài ${l.lesson_no}: ${l.title} (${l.title_vi})`;
-    select.appendChild(opt);
-  });
+  if (select) {
+    select.innerHTML = '';
+    window.HSK_LESSONS.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.lesson_no;
+      opt.textContent = `Bài ${l.lesson_no}: ${l.title} (${l.title_vi})`;
+      select.appendChild(opt);
+    });
+    select.value = currentLessonId;
+    select.addEventListener('change', (e) => {
+      switchLesson(parseInt(e.target.value));
+    });
+  }
 
-  select.value = currentLessonId;
-  select.addEventListener('change', (e) => {
-    switchLesson(parseInt(e.target.value));
-  });
+  if (headerSelect) {
+    headerSelect.innerHTML = '';
+    window.HSK_LESSONS.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.lesson_no;
+      opt.textContent = `Bài ${l.lesson_no}: ${l.title} (${l.title_vi})`;
+      headerSelect.appendChild(opt);
+    });
+    headerSelect.value = currentLessonId;
+    headerSelect.addEventListener('change', (e) => {
+      switchLesson(parseInt(e.target.value));
+    });
+  }
 }
 
 /**
@@ -162,6 +177,9 @@ function switchLesson(lessonNo) {
   // Cập nhật UI Dropdown & Tiêu đề
   const select = document.getElementById('lesson-select');
   if (select) select.value = currentLessonId;
+
+  const headerSelect = document.getElementById('header-lesson-select');
+  if (headerSelect) headerSelect.value = currentLessonId;
 
   // Cập nhật Header bài học
   const headerTitle = document.getElementById('lesson-header-title');

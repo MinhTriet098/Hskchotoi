@@ -162,6 +162,24 @@
         </button>
       </div>
 
+      <!-- Ô CHỌN BÀI NHANH Ở KHOẢNG TRỐNG NẰM GIỮA (STICKY HEADER) -->
+      <div class="flex items-center gap-1.5 flex-nowrap flex-shrink-0 mx-2">
+        <button onclick="prevLesson()" class="w-7 h-7 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all text-xs shadow-sm" title="Bài trước (❮)">
+          ❮
+        </button>
+        <div class="relative">
+          <select id="header-lesson-select" class="bg-slate-900 text-blue-400 border border-blue-500/50 hover:border-blue-400 rounded-xl px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-sm pr-7 appearance-none transition-all max-w-[220px] sm:max-w-[300px] truncate" title="Chọn nhanh bài học không cần cuộn lên trên">
+            <!-- Điền tự động qua JavaScript -->
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400 text-[10px]">
+            ▼
+          </div>
+        </div>
+        <button onclick="nextLesson()" class="w-7 h-7 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all text-xs shadow-sm" title="Bài tiếp theo (❯)">
+          ❯
+        </button>
+      </div>
+
       <div class="flex items-center gap-2 flex-nowrap">
         <!-- Game Bài Khoá (6 Trò) -->
         <button onclick="openDialogueGamesHub('sentence_builder')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600/30 to-orange-600/30 hover:from-amber-600/50 hover:to-orange-600/50 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm">
