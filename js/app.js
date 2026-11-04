@@ -538,10 +538,17 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
 
       <!-- Hàng dưới: Hộp câu ví dụ dark mode có pinyin trên đầu chữ Hán (Ruby) -->
       <div class="mt-1 p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 flex items-start gap-3.5 relative group/ex">
-        <!-- Nút loa phát âm cả câu ví dụ -->
-        <button onclick="speakChinese('${item.ex_hz}')" title="Nghe câu ví dụ" class="mt-1 w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/80 text-cyan-400 hover:bg-cyan-500 hover:text-white flex items-center justify-center flex-shrink-0 transition-all shadow-sm">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        </button>
+        <!-- Cột trái: Nút Loa & Nút Mic luyện phát âm câu ví dụ -->
+        <div class="flex flex-col gap-1.5 flex-shrink-0 mt-0.5">
+          <!-- Nút loa phát âm cả câu ví dụ -->
+          <button onclick="speakChinese('${item.ex_hz}')" title="Nghe câu ví dụ" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/80 text-cyan-400 hover:bg-cyan-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          </button>
+          <!-- Nút mic luyện nói câu ví dụ & chấm điểm AI -->
+          <button onclick="openVoiceModalForExample(${item.id})" title="Luyện đọc câu ví dụ & Chấm điểm phát âm AI" class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+          </button>
+        </div>
 
         <div class="flex-1 min-w-0">
           <!-- Câu Hán tự kèm Pinyin trên từng chữ (Ảnh 1) -->
@@ -555,10 +562,17 @@ function renderVocabList(filteredList = null, isGlobalSearch = false) {
           </p>
         </div>
 
-        <!-- Trái tim yêu thích câu ví dụ -->
-        <button onclick="this.classList.toggle('text-rose-500');" title="Yêu thích câu này" class="text-slate-600 hover:text-rose-500 transition-colors p-1">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </button>
+        <!-- Cột phải: Trái tim yêu thích & Nút Mini Game câu ví dụ -->
+        <div class="flex flex-col items-center gap-1.5 flex-shrink-0">
+          <!-- Trái tim yêu thích câu ví dụ -->
+          <button onclick="this.classList.toggle('text-rose-500');" title="Yêu thích câu này" class="text-slate-600 hover:text-rose-500 transition-colors p-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </button>
+          <!-- Nút Mini Game câu ví dụ (Đánh chữ, Dịch, Nối từ) -->
+          <button onclick="openExampleGamesModal(${item.id})" title="Chơi mini game câu ví dụ (Đánh chữ, Dịch, Nối từ)" class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-slate-950 flex items-center justify-center transition-all shadow-sm">
+            <span class="text-xs">🎮</span>
+          </button>
+        </div>
       </div>
     `;
 
